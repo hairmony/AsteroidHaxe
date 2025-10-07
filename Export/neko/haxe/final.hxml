@@ -1,10 +1,12 @@
 -main ApplicationMain 
---macro openfl.utils._internal.ExtraParamsMacro.include()
--cp C:/HaxeToolkit/haxe/lib/openfl/9,4,2/src
--D openfl=9.4.2
+-cp C:/HaxeToolkit/haxe/lib/flixel/6,1,0
+-D flixel=6.1.0
 --macro lime._internal.macros.DefineMacro.run()
 -cp C:/HaxeToolkit/haxe/lib/lime/8,2,3/src
 -D lime=8.2.3
+--macro openfl.utils._internal.ExtraParamsMacro.include()
+-cp C:/HaxeToolkit/haxe/lib/openfl/9,4,2/src
+-D openfl=9.4.2
 -cp Source
 -D lime-harfbuzz
 -D lime-openal
@@ -22,6 +24,7 @@
 -D windows
 -D desktop
 --remap flash:openfl
+--macro flixel.system.macros.FlxDefines.run()
 -cp Export/neko/haxe
 -neko Export/neko/obj/ApplicationMain.n
 --macro keep("Main")

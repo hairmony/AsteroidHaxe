@@ -12,6 +12,10 @@ class PlayState extends FlxState
 	var asteroid:Asteroid;
 	var projectiles:FlxGroup;
 
+	// Variables for the multi-shot cooldown
+	var multishotCooldown:Float = 0;
+	static inline var MULTISHOT_DELAY:Float = 10; // in seconds
+
 	override public function create():Void
 	{
 		super.create();
@@ -38,11 +42,37 @@ class PlayState extends FlxState
 			FlxG.resetState(); // Reset with R key
 		}
 
-		// Check for LMB
+		// Default: shoot 1 projectile with LMB
 		if (FlxG.mouse.justPressed)
 		{
-			var p = new Projectile(ship.getGraphicMidpoint().x, ship.getGraphicMidpoint().y, ship.angle - 90);
+			var p = new Projectile(ship.getGraphicMidpoint().x, ship.getGraphicMidpoint().y, ship.angle - 90, 0);
 			projectiles.add(p); // Add projectile to group
+		}
+
+		// Multishot cooldown decrement
+		if (multishotCooldown > 0)
+		{
+
+			// This code can be changed so
+			// cooldown is based on enemies hit
+			// instead of time
+			multishotCooldown -= elapsed;
+		}
+
+		// Multishot: shoot 8 projectiles in a circle
+		if (FlxG.keys.justPressed.SPACE && multishotCooldown <= 0)
+		{
+			// Reset the cooldown
+			multishotCooldown = MULTISHOT_DELAY;
+
+			var angleIncrement = 0;
+			for (i in 0...8)
+			{
+				// We use ship.angle here to base the shot direction on where the ship is facing
+				var p = new Projectile(ship.getGraphicMidpoint().x, ship.getGraphicMidpoint().y, ship.angle + angleIncrement, 1);
+				projectiles.add(p); // Add projectile to group
+				angleIncrement += 45;
+			}
 		}
 
 		FlxG.overlap(asteroid, ship, collide);
