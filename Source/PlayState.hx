@@ -14,11 +14,18 @@ class PlayState extends FlxState
 	var asteroid:Asteroid;//Make this a FlxGroup to spawn in multiple
 	var projectiles:FlxGroup;
 	var scoreText:FlxText;
-	public static var SCORE = 0;
+	var multishotText:FlxText; // New text to track multishot
+
+	// Score tracking variables
+	public var asteroidHits:Float = 0;
+	public var enemyHits:Float = 0;
+	public var accuracyBonus:Float = 0;
+	public var score:Float = 0;
 
 	// Variables for the multi-shot cooldown
-	var multishotCooldown:Float = 0;
-	static inline var MULTISHOT_DELAY:Float = 10; // in seconds
+	public var multishotCharge:Float = 0;
+	public static var MULTISHOT_CHARGE_MAX:Float = 1; // in number of objects killed
+	// TO BE CHANGED FROM 1
 
 	override public function create():Void
 	{
@@ -26,12 +33,19 @@ class PlayState extends FlxState
 		super.create();
 
 		//Create text
-		scoreText = new FlxText(25,25,0, "Score: " + SCORE, 16); //add 5th argument as true if we are adding custom fonts
+		scoreText = new FlxText(25,25,0, "Score: " + score, 16); //add 5th argument as true if we are adding custom fonts
 		add(scoreText);
+
+		multishotText = new FlxText(25,45,0, "Super: " + multishotCharge + "/" + MULTISHOT_CHARGE_MAX, 16);
+		add(multishotText);
 		
 		// Spawn in player
 		ship = new Player();
 		add(ship);
+
+		// Moved player spawn to bottom of the screen
+		ship.x = FlxG.width / 2;
+		ship.y = FlxG.height - 50;
 
 		// Spawn in stationary test asteroid
 		asteroid = new Asteroid();
@@ -61,21 +75,11 @@ class PlayState extends FlxState
 			projectiles.add(p); // Add projectile to group
 		}
 
-		// Multishot cooldown decrement
-		if (multishotCooldown > 0)
-		{
-
-			// This code can be changed so
-			// cooldown is based on enemies hit
-			// instead of time
-			multishotCooldown -= elapsed;
-		}
-
 		// Multishot: shoot 8 projectiles in a circle
-		if (FlxG.keys.justPressed.SPACE && multishotCooldown <= 0)
+		if (FlxG.keys.justPressed.SPACE && multishotCharge >= MULTISHOT_CHARGE_MAX)
 		{
 			// Reset the cooldown
-			multishotCooldown = MULTISHOT_DELAY;
+			multishotCharge = 0;
 
 			var angleIncrement = 0;
 			for (i in 0...8)
@@ -100,15 +104,48 @@ class PlayState extends FlxState
 	// Function handles projectile collision
 	function collideProjectile(object1:FlxObject, object2:FlxObject):Void
 	{
+		// Check if the object is an Asteroid
+		if (Std.isOfType(object1, Asteroid))
+		{
+			// Add to asteroid kill count
+			asteroidHits++;
+		}
+		// Add in when we have Enemy objects
+		// else if (Std.isOfType(object1, Enemy))
+		// {
+		// 	// Add to the enemy kill count
+		// 	enemyHits++;
+		// }
+
+		// Add to multishot charge when object is hit
+		if (multishotCharge < MULTISHOT_CHARGE_MAX)
+		{
+			multishotCharge++;
+			updateMultishotText(); // Update the display
+		}
+
 		// Kill both the asteroid and the projectile
 		object1.kill();
 		object2.kill();
 
-		// Add 10 points for the destruction of the asteroid
-		// WILL ADD SCORE FUNCTION TO ACCOUNT FOR MULTIPLIER AND ENEMY TYPE
-		// Will be implemented once enemies are implemented
-		SCORE += 10;
-		scoreText.text = "Score: " + SCORE;
+		// Update score
+		updateScoreText();
+	}
+
+	function updateMultishotText():Void
+	{
+		multishotText.text = "Super: " + multishotCharge + " / " + MULTISHOT_CHARGE_MAX;
+	}
+
+	// Function calculates score for player
+	function updateScoreText():Float
+	{
+		// Currently DOES NOT track multiplier bonuses
+		// Add code here for multiplier
+		score = asteroidHits * 100 + enemyHits * 200; // Calculating the base score
+		scoreText.text = "Score: " + score;
+
+		return(score);
 	}
 }
 
