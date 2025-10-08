@@ -5,12 +5,16 @@ import flixel.FlxObject;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.group.FlxGroup;
+import flixel.util.FlxSpriteUtil;
+import flixel.text.FlxText;
 
 class PlayState extends FlxState
 {
 	var ship:Player;
-	var asteroid:Asteroid;
+	var asteroid:Asteroid;//Make this a FlxGroup to spawn in multiple
 	var projectiles:FlxGroup;
+	var scoreText:FlxText;
+	public static var SCORE = 0;
 
 	// Variables for the multi-shot cooldown
 	var multishotCooldown:Float = 0;
@@ -21,6 +25,10 @@ class PlayState extends FlxState
 		FlxG.sound.playMusic("assets/music/Levelmusic.ogg", 1, true);
 		super.create();
 
+		//Create text
+		scoreText = new FlxText(25,25,0, "Score: " + SCORE, 16); //add 5th argument as true if we are adding custom fonts
+		add(scoreText);
+		
 		// Spawn in player
 		ship = new Player();
 		add(ship);
@@ -37,6 +45,9 @@ class PlayState extends FlxState
 	override public function update(elapsed:Float):Void
 	{
 		super.update(elapsed);
+
+		//Prevents the player from going offscreen
+		FlxSpriteUtil.cameraBound(ship);
 
 		if (FlxG.keys.justPressed.R)
 		{
@@ -92,6 +103,12 @@ class PlayState extends FlxState
 		// Kill both the asteroid and the projectile
 		object1.kill();
 		object2.kill();
+
+		// Add 10 points for the destruction of the asteroid
+		// WILL ADD SCORE FUNCTION TO ACCOUNT FOR MULTIPLIER AND ENEMY TYPE
+		// Will be implemented once enemies are implemented
+		SCORE += 10;
+		scoreText.text = "Score: " + SCORE;
 	}
 }
 
