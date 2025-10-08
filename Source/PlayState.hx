@@ -18,6 +18,7 @@ class PlayState extends FlxState
 
 	override public function create():Void
 	{
+		FlxG.sound.playMusic("assets/music/Levelmusic.ogg", 1, true);
 		super.create();
 
 		// Spawn in player
