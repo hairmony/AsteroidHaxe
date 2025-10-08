@@ -1,7 +1,12 @@
 Export/neko/bin/assets/images/Asteroid.png
+Export/neko/bin/assets/images/mbg.jpg
 Export/neko/bin/assets/images/Projectile.png
 Export/neko/bin/assets/images/Projectile2.png
 Export/neko/bin/assets/images/Ship1.png
+Export/neko/bin/assets/music/Levelmusic.mp3
+Export/neko/bin/assets/music/Levelmusic.ogg
+Export/neko/bin/assets/music/Menumusic.mp3
+Export/neko/bin/assets/music/Menumusic.ogg
 Export/neko/bin/flixel/sounds/beep.ogg
 Export/neko/bin/flixel/sounds/flixel.ogg
 Export/neko/bin/flixel/fonts/nokiafc22.ttf
