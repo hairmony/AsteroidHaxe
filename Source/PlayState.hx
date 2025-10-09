@@ -8,6 +8,7 @@ import flixel.group.FlxGroup;
 import flixel.util.FlxSpriteUtil;
 import flixel.text.FlxText;
 import flixel.ui.FlxButton;
+import flixel.util.FlxSave;
 
 class PlayState extends FlxState
 {
@@ -37,7 +38,7 @@ class PlayState extends FlxState
 
 	override public function create():Void
 	{
-		FlxG.sound.playMusic("assets/music/Levelmusic.ogg", 1, true);
+		FlxG.sound.playMusic("assets/music/LevelMusic.ogg", 1, true);
 		super.create();
 
 		//Create text
@@ -47,13 +48,21 @@ class PlayState extends FlxState
 		multishotText = new FlxText(25,45,0, "Super: " + multishotCharge + "/" + MULTISHOT_CHARGE_MAX, 16);
 		add(multishotText);
 
-		gameOverText = new FlxText(0, FlxG.height / 2, FlxG.width, "Skill Issue!", 32);
+		gameOverText = new FlxText(0, FlxG.height / 2, FlxG.width, "Transmission Lost", 32);
         gameOverText.alignment = CENTER;
         gameOverText.visible = false;
         add(gameOverText);
+
+        // Ship select from save file
+        var save = new FlxSave();
+		save.bind("LeftAligned");
+		var shipAsset:Int = 0; // Default to 0
+		if (save.data.shipChoice != null)
+			shipAsset = save.data.shipChoice;
+		save.close();
 		
 		// Spawn in player
-		ship = new Player();
+		ship = new Player(shipAsset);
 		add(ship);
 
 		// Moved player spawn to bottom of the screen
@@ -156,13 +165,13 @@ class PlayState extends FlxState
 			}
         }
 
-		FlxG.overlap(asteroid, ship, collide);
+		FlxG.overlap(asteroid, ship, collidePlayer);
 		FlxG.overlap(asteroid, projectiles, collideProjectile); // Check for collisions between asteroids, projectiles
 		// FlxG.overlap(enemy, projectiles, collideProjectile); // For when enemy is added
 		}
 
 
-	function collide(object1:FlxObject, object2:FlxObject):Void
+	function collidePlayer(object1:FlxObject, object2:FlxObject):Void
 	{
 		// object2.setPosition(50,50);
 		object2.kill();

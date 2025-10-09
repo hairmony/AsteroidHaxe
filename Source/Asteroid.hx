@@ -14,6 +14,7 @@ class Asteroid extends FlxSprite {
             case 0: "assets/images/Asteroid.png";
             case 1: "assets/images/Asteroid2.png";
             case 2: "assets/images/Asteroid3.png";
+            case 3: "assets/images/Asteroid4.png";
             default: "assets/images/Asteroid.png";
         };
 

@@ -10,14 +10,24 @@ class Player extends FlxSprite {
 	//var sprite:FlxSprite;
 	public static var PLAYER_SPEED = 150;
 
-	public function new(){
+	public function new(assetID: Int = 0){
 		super((FlxG.width/2),(FlxG.height/2));
 		//sprite = new FlxSprite();
-		loadGraphic("assets/images/Ship1.png");//Dimensions for placeholder
+
+		var asset = switch(assetID) {
+            case 0: "assets/images/Ship.png";
+            case 1: "assets/images/Ship2.png";
+            case 2: "assets/images/Ship3.png";
+            case 3: "assets/images/Ship4.png";
+            default: "assets/images/Ship.png";
+        };
+
+		loadGraphic(asset);//Dimensions for placeholder
 			
 		x = (FlxG.width/2) - (width/2); 
 		y = (FlxG.height /2) - (height /2);
-		// scale.set(0.1, 0.1); // Sprite scale. COMMENT OUT IF SPRITE IS OF CORRECT SIZE
+
+		scale.set(1.1, 1.1); // Sprite scale. COMMENT OUT IF SPRITE IS OF CORRECT SIZE
 	}
 
 	

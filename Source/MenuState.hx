@@ -4,11 +4,18 @@ import flixel.FlxState;
 import flixel.ui.FlxButton;
 import flixel.FlxG;
 import flixel.FlxSprite;
+import flixel.text.FlxText;
+import flixel.util.FlxSave;
 
 
 class MenuState extends FlxState
 {
 	var bg:FlxSprite;
+	var titleText:FlxText; // Variable for the title
+
+	public var shipButton:FlxButton;
+	public var currentShipNumber:Int = 0;
+	public static var SHIP_MAX = 3;
 
 	function scaleBackgroundToCover(sprite:FlxSprite, targetWidth:Int, targetHeight:Int):Void
     {
@@ -29,10 +36,10 @@ class MenuState extends FlxState
 	{
 		super.create();
 
-		FlxG.sound.playMusic("assets/music/Menumusic.ogg", 1, true);
+		FlxG.sound.playMusic("assets/music/MenuMusic.ogg", 1, true);
 
 		bg = new FlxSprite();
-        bg.loadGraphic("assets/images/mbg.jpg", false, 0, 0, false);
+        bg.loadGraphic("assets/images/MenuBackground.png", false, 0, 0, false);
 
         // Scale background to fit window size
         scaleBackgroundToCover(bg, FlxG.width, FlxG.height);
@@ -43,10 +50,18 @@ class MenuState extends FlxState
         // Add background to state
         add(bg);
 
+        titleText = new FlxText(25, FlxG.height * 0.25, FlxG.width, "Left: ALIGNED");
+		titleText.setFormat(null, 32, 0xffffff, "left"); // Set font size, color, and alignment
+		add(titleText);
+
 		var playButton:FlxButton;
 		playButton = new FlxButton(0, 0, "Play", clickPlay);
 		add(playButton);
 		playButton.screenCenter();
+
+		shipButton = new FlxButton(0, playButton.y + 25, "", cycleShipChoice);
+		add(shipButton);
+		updateShipButtonText(); // Set the initial text
 	}
 
 	function clickPlay()
@@ -54,6 +69,33 @@ class MenuState extends FlxState
 		FlxG.switchState(PlayState.new);
 	}
 
+	function cycleShipChoice()
+	{
+		currentShipNumber++;
+		if (currentShipNumber >= SHIP_MAX)
+		{
+			currentShipNumber = 0; // Wrap around to the first ship
+		}
+
+		saveShipChoice();
+		updateShipButtonText();
+	}
+
+	function saveShipChoice()
+	{
+		var save = new FlxSave();
+		save.bind("LeftAligned");
+		save.data.shipChoice = currentShipNumber;
+		save.flush(); // Immediately write the data to the file
+		save.close();
+	}
+
+	function updateShipButtonText()
+	{
+		// We add 1 to the index to show "Ship: 1" instead of "Ship: 0"
+		shipButton.text = "Ship: " + (currentShipNumber + 1);
+		shipButton.screenCenter(X); // Recenter the button after text changes
+	}
 
 	override public function update(elapsed:Float)
 	{
