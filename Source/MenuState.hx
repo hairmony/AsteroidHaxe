@@ -29,6 +29,8 @@ class MenuState extends FlxState
 	{
 		super.create();
 
+		FlxG.sound.playMusic("assets/music/Menumusic.ogg", 1, true);
+
 		bg = new FlxSprite();
         bg.loadGraphic("assets/images/mbg.jpg", false, 0, 0, false);
 
@@ -41,10 +43,6 @@ class MenuState extends FlxState
         // Add background to state
         add(bg);
 
-	if (FlxG.sound.music == null)
-	{
-		FlxG.sound.playMusic("assets/music/Menumusic.ogg", 1, true);
-	}
 		var playButton:FlxButton;
 		playButton = new FlxButton(0, 0, "Play", clickPlay);
 		add(playButton);

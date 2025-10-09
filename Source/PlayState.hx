@@ -7,6 +7,7 @@ import flixel.FlxSprite;
 import flixel.group.FlxGroup;
 import flixel.util.FlxSpriteUtil;
 import flixel.text.FlxText;
+import flixel.ui.FlxButton;
 
 class PlayState extends FlxState
 {
@@ -15,6 +16,7 @@ class PlayState extends FlxState
 	var projectiles:FlxGroup;
 	var scoreText:FlxText;
 	var multishotText:FlxText; // New text to track multishot
+	var gameOverText:FlxText;
 
 	// Score tracking variables
 	public var asteroidHits:Float = 0;
@@ -24,8 +26,14 @@ class PlayState extends FlxState
 
 	// Variables for the multi-shot cooldown
 	public var multishotCharge:Float = 0;
-	public static var MULTISHOT_CHARGE_MAX:Float = 5; // in number of objects killed
-	// TO BE CHANGED FROM 1
+	public static var MULTISHOT_CHARGE_MAX:Float = 20; // in number of objects killed
+	public static var MULTISHOT_SHOT_AMOUNT:Int = 6;
+	public static var ASTEROID_AMOUNT:Int = 5;
+	
+	// Pause menu variables
+	var isPaused:Bool = false;
+    var pauseGroup:FlxGroup;
+    var pauseText:FlxText;
 
 	override public function create():Void
 	{
@@ -38,6 +46,11 @@ class PlayState extends FlxState
 
 		multishotText = new FlxText(25,45,0, "Super: " + multishotCharge + "/" + MULTISHOT_CHARGE_MAX, 16);
 		add(multishotText);
+
+		gameOverText = new FlxText(0, FlxG.height / 2, FlxG.width, "Skill Issue!", 32);
+        gameOverText.alignment = CENTER;
+        gameOverText.visible = false;
+        add(gameOverText);
 		
 		// Spawn in player
 		ship = new Player();
@@ -51,7 +64,7 @@ class PlayState extends FlxState
 		asteroid = new FlxGroup();
 		add(asteroid);
 
-		for(i in 0...5) {
+		for(i in 0...ASTEROID_AMOUNT) {
 			var a = new Asteroid();
 			asteroid.add(a);
 		}
@@ -59,6 +72,38 @@ class PlayState extends FlxState
 		// New projectile group
 		projectiles = new FlxGroup(); 
 		add(projectiles);
+
+		// PAUSE MENU CODE
+
+		// Create pause menu group but keep it hidden initially
+        pauseGroup = new FlxGroup();
+        pauseGroup.visible = false;
+        add(pauseGroup);
+
+        // Dim background
+        var bg = new FlxSprite();
+        bg.makeGraphic(FlxG.width, FlxG.height, 0x88000000);
+        pauseGroup.add(bg);
+
+        // “PAUSED” text
+        var pauseText = new FlxText(0, 100, FlxG.width, "PAUSED");
+        pauseText.setFormat(null, 32, 0xFFFFFFFF, "center");
+        pauseGroup.add(pauseText);
+
+        // Continue button
+        var btnContinue = new FlxButton(0, 200, "Continue", onContinue);
+        btnContinue.screenCenter(X);
+        pauseGroup.add(btnContinue);
+
+        // Restart button
+        var btnRestart = new FlxButton(0, 260, "Restart", onRestart);
+        btnRestart.screenCenter(X);
+        pauseGroup.add(btnRestart);
+
+        // Exit button
+        var btnExit = new FlxButton(0, 320, "Exit", onExit);
+        btnExit.screenCenter(X);
+        pauseGroup.add(btnExit);
 	}
 
 	override public function update(elapsed:Float):Void
@@ -68,42 +113,60 @@ class PlayState extends FlxState
 		//Prevents the player from going offscreen
 		FlxSpriteUtil.cameraBound(ship);
 
+		// Reset button
 		if (FlxG.keys.justPressed.R)
 		{
 			FlxG.resetState(); // Reset with R key
 		}
 
-		// Default: shoot 1 projectile with LMB
-		if (FlxG.mouse.justPressed)
-		{
-			var p = new Projectile(ship.getGraphicMidpoint().x, ship.getGraphicMidpoint().y, ship.angle - 90, 0);
-			projectiles.add(p); // Add projectile to group
-		}
+		if (FlxG.keys.justPressed.ESCAPE)
+        {
+            togglePause();
+        }
 
-		// Multishot: shoot 8 projectiles in a circle
-		if (FlxG.keys.justPressed.SPACE && multishotCharge >= MULTISHOT_CHARGE_MAX)
-		{
-			// Reset the cooldown
-			multishotCharge = 0;
+        // Only run gameplay updates if NOT paused
+        if (!isPaused)
+        {
+            // your normal gameplay code goes here (player movement, collisions, etc.)
 
-			var angleIncrement = 0;
-			for (i in 0...8)
+            if (ship.alive) // Ship controls disabled if ship is dead
 			{
-				// We use ship.angle here to base the shot direction on where the ship is facing
-				var p = new Projectile(ship.getGraphicMidpoint().x, ship.getGraphicMidpoint().y, ship.angle + angleIncrement, 1);
-				projectiles.add(p); // Add projectile to group
-				angleIncrement += 45;
+				// Default: shoot 1 projectile with LMB
+				if (FlxG.mouse.justPressed)
+				{
+					var p = new Projectile(ship.getGraphicMidpoint().x, ship.getGraphicMidpoint().y, ship.angle - 90, 0);
+					projectiles.add(p); // Add projectile to group
+				}
+
+				// Multishot: shoot 8 projectiles in a circle
+				if (FlxG.keys.justPressed.SPACE && multishotCharge >= MULTISHOT_CHARGE_MAX)
+				{
+					// Reset the cooldown
+					multishotCharge = 0;
+
+					var angleIncrement:Float = 0;
+					for (i in 0...MULTISHOT_SHOT_AMOUNT)
+					{
+						// We use ship.angle here to base the shot direction on where the ship is facing
+						var p = new Projectile(ship.getGraphicMidpoint().x, ship.getGraphicMidpoint().y, ship.angle + angleIncrement, 1);
+						projectiles.add(p); // Add projectile to group
+						angleIncrement += (360/MULTISHOT_SHOT_AMOUNT);
+					}
+				}
 			}
-		}
+        }
 
 		FlxG.overlap(asteroid, ship, collide);
 		FlxG.overlap(asteroid, projectiles, collideProjectile); // Check for collisions between asteroids, projectiles
 		// FlxG.overlap(enemy, projectiles, collideProjectile); // For when enemy is added
-	}
+		}
+
 
 	function collide(object1:FlxObject, object2:FlxObject):Void
 	{
-		object2.setPosition(50,50);
+		// object2.setPosition(50,50);
+		object2.kill();
+		gameOverText.visible = true;
 	}
 
 	// Function handles projectile collision
@@ -112,6 +175,9 @@ class PlayState extends FlxState
 		// Check if the object is an Asteroid
 		if (Std.isOfType(object1, Asteroid))
 		{
+			var a = new Asteroid();
+			asteroid.add(a);
+
 			// Add to asteroid kill count
 			asteroidHits++;
 		}
@@ -135,9 +201,6 @@ class PlayState extends FlxState
 
 		// Update score
 		updateScoreText();
-
-		var a = new Asteroid();
-		asteroid.add(a);
 	}
 
 	function updateMultishotText():Void
@@ -155,4 +218,35 @@ class PlayState extends FlxState
 
 		return(score);
 	}
+
+	function togglePause():Void
+    {
+        isPaused = !isPaused;
+        pauseGroup.visible = isPaused;
+    }
+
+    function onContinue():Void
+    {
+    	if (isPaused) 
+    	{
+        	togglePause();
+    	}
+    }
+
+    function onRestart():Void
+    {
+    	if (isPaused)
+    	{
+        	FlxG.resetState();
+        }
+    }
+
+    function onExit():Void
+    {
+    	if (isPaused)
+    	{
+    		FlxG.sound.playMusic(null, 1, true);
+        	FlxG.switchState(new MenuState());
+    	}
+    }
 }

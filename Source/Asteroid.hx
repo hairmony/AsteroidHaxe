@@ -5,11 +5,21 @@ import flixel.util.FlxSpriteUtil;
 
 class Asteroid extends FlxSprite {
 	public static var ASTEROID_SPEED:Int = 100; //Default value
-	public function new(){
+	
+	public function new(assetID:Int = 0)
+	{
 		super();
-		loadGraphic("assets/images/Asteroid.png");
 
-		x = FlxG.random.float(0.0,1.0) * FlxG.width;
+		var asset = switch(assetID) {
+            case 0: "assets/images/Asteroid.png";
+            case 1: "assets/images/Asteroid2.png";
+            case 2: "assets/images/Asteroid3.png";
+            default: "assets/images/Asteroid.png";
+        };
+
+		loadGraphic(asset, false);
+
+		x = FlxG.random.float(0.0,1.0) * (FlxG.width - 32);
 		y = 0; //Always spawn at the top
 
 	}
@@ -22,7 +32,7 @@ class Asteroid extends FlxSprite {
 
 		if (!isOnScreen()){
 			y = 0;
-			x = FlxG.random.float(0.0,1.0) * FlxG.width;
+			x = FlxG.random.float(0.0,1.0) * (FlxG.width - 32);
 			velocity.x = FlxG.random.float(-50.0,50.0);
 		}
 	}

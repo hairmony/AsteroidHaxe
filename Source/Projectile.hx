@@ -19,6 +19,7 @@ class Projectile extends FlxSprite
         };
 
         loadGraphic(asset, false);
+        
         x -= width / 2;
         y -= height / 2;
         
@@ -37,6 +38,7 @@ class Projectile extends FlxSprite
         if (!isOnScreen())
         {
             kill();
+
         }
     }
 }
