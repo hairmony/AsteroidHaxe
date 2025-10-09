@@ -4,20 +4,26 @@ import flixel.FlxG;
 import flixel.util.FlxSpriteUtil;
 
 class Asteroid extends FlxSprite {
+	public static var ASTEROID_SPEED:Int = 100; //Default value
 	public function new(){
 		super();
 		loadGraphic("assets/images/Asteroid.png");
 
-		x = (FlxG.width/2); 
-		y = (FlxG.height/2);
-		//Making the x and y coordinates not the center of the screen extends the hitbox past the sprite boundaries by offset
-		
-		// scale.set(0.2,0.2); //Scale not needed if actual sprite is correct size
-		updateHitbox(); //Only use after scale is set
+		x = FlxG.random.float(0.0,1.0) * FlxG.width;
+		y = 0; //Always spawn at the top
+
 	}
 
 	override public function update(elapsed:Float):Void {
-		//Asteroid behaviour goes here
-		//Update the sprite.velocity.x and sprite.velocity.x
+		super.update(elapsed);
+
+		velocity.y = ASTEROID_SPEED;
+		velocity.x = FlxG.random.float(-50.0,50.0);
+
+		if (!isOnScreen()){
+			y = 0;
+			x = FlxG.random.float(0.0,1.0) * FlxG.width;
+			velocity.x = FlxG.random.float(-50.0,50.0);
+		}
 	}
 }

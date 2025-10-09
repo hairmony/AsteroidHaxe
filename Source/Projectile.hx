@@ -40,4 +40,3 @@ class Projectile extends FlxSprite
         }
     }
 }
-

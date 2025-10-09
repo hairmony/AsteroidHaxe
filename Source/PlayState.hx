@@ -11,7 +11,7 @@ import flixel.text.FlxText;
 class PlayState extends FlxState
 {
 	var ship:Player;
-	var asteroid:Asteroid;//Make this a FlxGroup to spawn in multiple
+	var asteroid:FlxGroup;//Make this a FlxGroup to spawn in multiple
 	var projectiles:FlxGroup;
 	var scoreText:FlxText;
 	var multishotText:FlxText; // New text to track multishot
@@ -24,7 +24,7 @@ class PlayState extends FlxState
 
 	// Variables for the multi-shot cooldown
 	public var multishotCharge:Float = 0;
-	public static var MULTISHOT_CHARGE_MAX:Float = 1; // in number of objects killed
+	public static var MULTISHOT_CHARGE_MAX:Float = 5; // in number of objects killed
 	// TO BE CHANGED FROM 1
 
 	override public function create():Void
@@ -48,8 +48,13 @@ class PlayState extends FlxState
 		ship.y = FlxG.height - 50;
 
 		// Spawn in stationary test asteroid
-		asteroid = new Asteroid();
+		asteroid = new FlxGroup();
 		add(asteroid);
+
+		for(i in 0...5) {
+			var a = new Asteroid();
+			asteroid.add(a);
+		}
 
 		// New projectile group
 		projectiles = new FlxGroup(); 
@@ -130,11 +135,14 @@ class PlayState extends FlxState
 
 		// Update score
 		updateScoreText();
+
+		var a = new Asteroid();
+		asteroid.add(a);
 	}
 
 	function updateMultishotText():Void
 	{
-		multishotText.text = "Super: " + multishotCharge + " / " + MULTISHOT_CHARGE_MAX;
+		multishotText.text = "Super: " + multishotCharge + "/" + MULTISHOT_CHARGE_MAX;
 	}
 
 	// Function calculates score for player
@@ -148,4 +156,3 @@ class PlayState extends FlxState
 		return(score);
 	}
 }
-
