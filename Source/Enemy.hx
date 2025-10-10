@@ -72,17 +72,6 @@ class Enemy extends FlxSprite
                 x = -32; 
                 velocity.x = ENEMY_SPEED;
             }
-        }
-
-        if(PlayState.MULTIPLIER > 1)
-        {
-				PlayState.MULTIPLIER--;
-				PlayState.multiplierText.text = PlayState.MULTIPLIER + "X";
-				if(PlayState.MULTIPLIER == 1)
-				{
-					PlayState.multiplierText.visible = false;
-				}
-		}
-		
+        }		
 	}
 }

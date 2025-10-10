@@ -23,21 +23,25 @@ class PlayState extends FlxState
 	var multishotText:FlxText; // New text to track multishot
 	var multishotControlsText:FlxText;
 	var gameOverText:FlxText;
-	public static var multiplierText:FlxText; //Set to static to be accessible from Enemy.hx
+	var multiplierText:FlxText; //Set to static to be accessible from Enemy.hx
 	var enemy:FlxGroup;
 	var timer:FlxTimer;
 
 	// Score tracking variables
-	public var asteroidHits:Float = 0;
-	public var enemyHits:Float = 0;
+	public var asteroidHits:Int = 0;
+	public var enemyHits:Int = 0;
 	public var accuracyBonus:Float = 0;
 	public var score:Float = 0;
+
 	public static var MULTIPLIER:Int = 1; //Set the multiplier to 1; Set to static to be accessible from Enemy.hx
+	public static var multiplierTimer:Float = 0;
+	private static var MULTIPLIER_MAX:Int = 10;
+	private static var MULTIPLIER_DECAY:Float = 5.0; // seconds per decay
 
 	// Variables for the multi-shot cooldown
 	public var multishotCharge:Float = 0;
 	public static var MULTISHOT_CHARGE_MAX:Float = 20; // in number of objects killed
-	public static var MULTISHOT_SHOT_AMOUNT:Int = 6;
+	public static var MULTISHOT_SHOT_AMOUNT:Int = 8;
 	public static var ASTEROID_AMOUNT:Int = 5;
 
 	// Variables for enemies
@@ -52,6 +56,9 @@ class PlayState extends FlxState
 
 	override public function create():Void
 	{
+		MULTIPLIER = 1;
+		multiplierTimer = 0;
+
 		FlxG.sound.playMusic("assets/music/LevelMusic.ogg", 1, true);
 		super.create();
 
@@ -63,7 +70,7 @@ class PlayState extends FlxState
 		add(multishotText);
 
 		multiplierText = new FlxText(25, 65, 0, MULTIPLIER + "x", 14);
-		multiplierText.visible = false;
+		multiplierText.visible = true;
 		add(multiplierText);
 
 		gameOverText = new FlxText(0, FlxG.height / 2, FlxG.width, "Transmission Lost", 32);
@@ -168,6 +175,22 @@ class PlayState extends FlxState
 		//Prevents the player from going offscreen
 		FlxSpriteUtil.cameraBound(ship);
 
+		multiplierText.text = MULTIPLIER + "x"; // Always show
+		multiplierText.visible = true;
+
+		// Handle multiplier countdown
+		if(MULTIPLIER > 1)
+		{
+		    // multiplierText.text = MULTIPLIER + "x";
+		    multiplierTimer += elapsed; // increment timer
+		    
+		    if (multiplierTimer >= MULTIPLIER_DECAY)
+		    {
+		    	MULTIPLIER--;
+		    	multiplierTimer = 0;
+		    }
+		}
+		
 		// Reset button
 		if (FlxG.keys.justPressed.R)
 		{
@@ -254,6 +277,7 @@ class PlayState extends FlxState
 		{
 			// Add to the enemy kill count
 		 	enemyHits++;
+		 	updateMultiplier();
 
 		 	var e = new Enemy();
 		 	enemy.add(e);
@@ -287,20 +311,22 @@ class PlayState extends FlxState
 	// Function calculates score for player
 	function updateScoreText():Float
 	{
-		// Add code here for multiplier
-		if (enemyHits % 5 == 0){
-			if (MULTIPLIER < 5){
-				MULTIPLIER++;
-			}
-			multiplierText.text = MULTIPLIER + "X";
-			multiplierText.visible = true;
-		}
-
 		score = asteroidHits * 100 + enemyHits * 200; // Calculating the base score
 		score *= MULTIPLIER;
 		scoreText.text = "Score: " + score;
 
 		return(score);
+	}
+
+	function updateMultiplier()
+	{
+		// Increase multiplier, up to max
+	    if(MULTIPLIER < MULTIPLIER_MAX)
+	    {
+	        MULTIPLIER++;
+	    }
+	    
+	    multiplierTimer = 0;
 	}
 
 	//I feel this can be optimized

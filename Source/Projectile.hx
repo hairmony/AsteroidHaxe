@@ -29,8 +29,8 @@ class Projectile extends FlxSprite
         {
             speed = ENEMY_PROJECTILE_SPEED;
             this.angle = Angle; //angle already calculated in PlayState
-            velocity.x = Math.cos(Angle * (Math.PI / 180)) * E_PROJECTILE_SPEED;
-            velocity.y = Math.sin(Angle * (Math.PI / 180)) * E_PROJECTILE_SPEED;
+            // velocity.x = Math.cos(Angle * (Math.PI / 180)) * E_PROJECTILE_SPEED;
+            // velocity.y = Math.sin(Angle * (Math.PI / 180)) * E_PROJECTILE_SPEED;
         }
         else 
         {
