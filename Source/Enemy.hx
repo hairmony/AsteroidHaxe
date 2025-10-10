@@ -24,7 +24,7 @@ class Enemy extends FlxSprite {
 		x = initX;
 		y = FlxG.random.float(0.0,1.0) * (FlxG.height - 32);
 
-		scale.set(0.1,0.1);
+		//scale.set(0.1,0.1); //COMMENT OUT IF CORRECT SPRITE IS USED
 		updateHitbox();
 
 		//Make enemies travel left or right depending on initial x spawn
@@ -37,10 +37,19 @@ class Enemy extends FlxSprite {
 
 	override public function update(elapsed:Float):Void {
 		super.update(elapsed);
-
+		
 		if (!isOnScreen()) {
 			y = FlxG.random.float(0.0,1.0) * (FlxG.height - 32);
 			x = initX; //reset back to initial x
+
+			//
+			if(PlayState.MULTIPLIER > 1){
+				PlayState.MULTIPLIER--;
+				PlayState.multiplierText.text = PlayState.MULTIPLIER + "X";
+				if(PlayState.MULTIPLIER == 1){
+					PlayState.multiplierText.visible = false;
+				}
+			}
 		}
 	}
 }

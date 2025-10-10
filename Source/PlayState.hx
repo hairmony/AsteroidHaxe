@@ -21,6 +21,7 @@ class PlayState extends FlxState
 	var scoreText:FlxText;
 	var multishotText:FlxText; // New text to track multishot
 	var gameOverText:FlxText;
+	public static var multiplierText:FlxText; //Set to static to be accessible from Enemy.hx
 	var enemy:FlxGroup;
 	var timer:FlxTimer;
 
@@ -29,6 +30,7 @@ class PlayState extends FlxState
 	public var enemyHits:Float = 0;
 	public var accuracyBonus:Float = 0;
 	public var score:Float = 0;
+	public static var MULTIPLIER:Int = 1; //Set the multiplier to 1; Set to static to be accessible from Enemy.hx
 
 	// Variables for the multi-shot cooldown
 	public var multishotCharge:Float = 0;
@@ -57,6 +59,11 @@ class PlayState extends FlxState
 		multishotText = new FlxText(25,45,0, "Super: " + multishotCharge + "/" + MULTISHOT_CHARGE_MAX, 16);
 		add(multishotText);
 
+		multiplierText = new FlxText(25, 65, 0, MULTIPLIER + "X", 16);
+		multiplierText.visible = false;
+		add(multiplierText);
+
+
 		gameOverText = new FlxText(0, FlxG.height / 2, FlxG.width, "Transmission Lost", 32);
         gameOverText.alignment = CENTER;
         gameOverText.visible = false;
@@ -65,7 +72,9 @@ class PlayState extends FlxState
         // Ship select from save file
         var save = new FlxSave();
 		save.bind("LeftAligned");
-		var shipAsset = save.data.shipChoice;
+		var shipAsset:Int = 0; // Default to 0
+		if (save.data.shipChoice != null)
+			shipAsset = save.data.shipChoice;
 		save.close();
 		
 		// Spawn in player
@@ -89,21 +98,21 @@ class PlayState extends FlxState
 		projectiles = new FlxGroup(); 
 		add(projectiles);
 
+		//Create enemy group
 		enemy = new FlxGroup();
 		add(enemy);
 
-		//Only spawns in 1 enemy for now
 		for(i in 0...ENEMY_AMOUNT){
 			var e = new Enemy();
 			enemy.add(e);
 		}
 
+		//Create a seperate projectiles group for enemy projectiles
 		enemyProjectiles = new FlxGroup();
 		add(enemyProjectiles);
 
 		//create a timer that shoots an enemy projectile every 3 seconds
 		SHOT_DELAY = FlxG.random.float(-0.5, 0.5) + 3;
-		// Haxe
 		timer = new FlxTimer().start(SHOT_DELAY, enemyShot, 0);
 
 		// PAUSE MENU CODE
@@ -149,6 +158,7 @@ class PlayState extends FlxState
 		// Reset button
 		if (FlxG.keys.justPressed.R)
 		{
+			MULTIPLIER = 1;
 			FlxG.resetState(); // Reset with R key
 		}
 
@@ -185,6 +195,8 @@ class PlayState extends FlxState
 						projectiles.add(p); // Add projectile to group
 						angleIncrement += (360/MULTISHOT_SHOT_AMOUNT);
 					}
+
+					multishotText.text = "Super: " + multishotCharge + "/" + MULTISHOT_CHARGE_MAX;
 				}
 			}
         }
@@ -259,7 +271,16 @@ class PlayState extends FlxState
 	{
 		// Currently DOES NOT track multiplier bonuses
 		// Add code here for multiplier
+		if (enemyHits % 5 == 0){
+			if (MULTIPLIER < 5){
+				MULTIPLIER++;
+			}
+			multiplierText.text = MULTIPLIER + "X";
+			multiplierText.visible = true;
+		}
+
 		score = asteroidHits * 100 + enemyHits * 200; // Calculating the base score
+		score *= MULTIPLIER;
 		scoreText.text = "Score: " + score;
 
 		return(score);
@@ -321,7 +342,7 @@ class PlayState extends FlxState
     	if (isPaused)
     	{
     		FlxG.sound.playMusic(null, 1, true);
-        	FlxG.switchState(MenuState.new);
+        	FlxG.switchState(MenuState.new); //Run time bug
     	}
     }
 }
