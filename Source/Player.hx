@@ -28,7 +28,6 @@ class Player extends FlxSprite {
 		y = (FlxG.height /2) - (height /2);
 
 		scale.set(1.1, 1.1); // Sprite scale. COMMENT OUT IF SPRITE IS OF CORRECT SIZE
-
 		updateHitbox();
 	}
 
@@ -36,6 +35,7 @@ class Player extends FlxSprite {
 	override public function update(elapsed:Float):Void
 	{
 		super.update(elapsed);
+
 		if(FlxG.keys.enabled){
 			if(FlxG.keys.pressed.A){
 				x -= PLAYER_SPEED * elapsed;

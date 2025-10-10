@@ -28,24 +28,29 @@ class Projectile extends FlxSprite
         if(isEnemy) 
         {
             speed = ENEMY_PROJECTILE_SPEED;
-            this.angle = Angle; //angle already calculated in PlayState
-        }
-        else 
-        {
-            speed = PLAYER_PROJECTILE_SPEED;
+        if(isEnemy == false) {
             this.angle = Angle + 90; // Angle sprite towards where its pointing
-        }
 
-        // Set velocity and angle of projectile based on ship
-        velocity.x = Math.cos(Angle * (Math.PI / 180)) * speed;
-        velocity.y = Math.sin(Angle * (Math.PI / 180)) * speed;
+            // Set velocity and angle of projectile based on ship
+            velocity.x = Math.cos(Angle * (Math.PI / 180)) * PROJECTILE_SPEED;
+            velocity.y = Math.sin(Angle * (Math.PI / 180)) * PROJECTILE_SPEED;
+        }
+        else {
+            this.angle = Angle; //angle already calculated in PlayState
+            velocity.x = Math.cos(Angle * (Math.PI / 180)) * E_PROJECTILE_SPEED;
+            velocity.y = Math.sin(Angle * (Math.PI / 180)) * E_PROJECTILE_SPEED;
+        }
+//         else 
+//         {
+//             speed = PLAYER_PROJECTILE_SPEED;
+//             this.angle = Angle + 90; // Angle sprite towards where its pointing
+//         }        
     }
 
     override public function update(elapsed:Float):Void
     {
         super.update(elapsed);
 
-        // Kill if projectile goes off-screen
         if (!isOnScreen())
         {
             kill();
