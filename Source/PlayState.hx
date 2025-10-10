@@ -56,9 +56,7 @@ class PlayState extends FlxState
         // Ship select from save file
         var save = new FlxSave();
 		save.bind("LeftAligned");
-		var shipAsset:Int = 0; // Default to 0
-		if (save.data.shipChoice != null)
-			shipAsset = save.data.shipChoice;
+		var shipAsset = save.data.shipChoice;
 		save.close();
 		
 		// Spawn in player
@@ -255,7 +253,7 @@ class PlayState extends FlxState
     	if (isPaused)
     	{
     		FlxG.sound.playMusic(null, 1, true);
-        	FlxG.switchState(new MenuState());
+        	FlxG.switchState(MenuState.new);
     	}
     }
 }

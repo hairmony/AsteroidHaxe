@@ -71,11 +71,12 @@ class MenuState extends FlxState
 
 	function cycleShipChoice()
 	{
-		currentShipNumber++;
-		if (currentShipNumber >= SHIP_MAX)
+		if (currentShipNumber >= SHIP_MAX - 1)
 		{
 			currentShipNumber = 0; // Wrap around to the first ship
 		}
+		else
+			currentShipNumber++;
 
 		saveShipChoice();
 		updateShipButtonText();
@@ -92,7 +93,6 @@ class MenuState extends FlxState
 
 	function updateShipButtonText()
 	{
-		// We add 1 to the index to show "Ship: 1" instead of "Ship: 0"
 		shipButton.text = "Ship: " + (currentShipNumber + 1);
 		shipButton.screenCenter(X); // Recenter the button after text changes
 	}
