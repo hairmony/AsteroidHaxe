@@ -72,7 +72,7 @@ class MenuState extends FlxState
 	function cycleShipChoice()
 	{
 		currentShipNumber++;
-		if (currentShipNumber >= SHIP_MAX)
+		if (currentShipNumber >= SHIP_MAX - 1)
 		{
 			currentShipNumber = 0; // Wrap around to the first ship
 		}

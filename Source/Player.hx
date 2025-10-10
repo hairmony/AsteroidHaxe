@@ -28,6 +28,7 @@ class Player extends FlxSprite {
 		y = (FlxG.height /2) - (height /2);
 
 		scale.set(1.1, 1.1); // Sprite scale. COMMENT OUT IF SPRITE IS OF CORRECT SIZE
+		updateHitbox();
 	}
 
 	
