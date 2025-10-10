@@ -5,7 +5,9 @@ import flixel.FlxG;
 
 class Projectile extends FlxSprite
 {
-    public static var PROJECTILE_SPEED:Int = 300; // Projectile speed in pixel per sec
+    public static var PLAYER_PROJECTILE_SPEED:Int = 250; // Projectile speed in pixel per sec
+    public static var ENEMY_PROJECTILE_SPEED:Int = 95; //125
+    public var speed = 1;
 
     public function new(X:Float, Y:Float, Angle:Float, isEnemy:Bool, assetID: Int = 0)
     {
@@ -23,16 +25,20 @@ class Projectile extends FlxSprite
         x -= width / 2;
         y -= height / 2;
         
-        if(isEnemy == false) {
-            this.angle = Angle + 90; // Angle sprite towards where its pointing
-        }
-        else {
+        if(isEnemy) 
+        {
+            speed = ENEMY_PROJECTILE_SPEED;
             this.angle = Angle; //angle already calculated in PlayState
+        }
+        else 
+        {
+            speed = PLAYER_PROJECTILE_SPEED;
+            this.angle = Angle + 90; // Angle sprite towards where its pointing
         }
 
         // Set velocity and angle of projectile based on ship
-        velocity.x = Math.cos(Angle * (Math.PI / 180)) * PROJECTILE_SPEED;
-        velocity.y = Math.sin(Angle * (Math.PI / 180)) * PROJECTILE_SPEED;
+        velocity.x = Math.cos(Angle * (Math.PI / 180)) * speed;
+        velocity.y = Math.sin(Angle * (Math.PI / 180)) * speed;
     }
 
     override public function update(elapsed:Float):Void
