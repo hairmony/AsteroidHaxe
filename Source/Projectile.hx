@@ -7,7 +7,7 @@ class Projectile extends FlxSprite
 {
     public static var PROJECTILE_SPEED:Int = 300; // Projectile speed in pixel per sec
 
-    public function new(X:Float, Y:Float, Angle:Float, assetID: Int = 0)
+    public function new(X:Float, Y:Float, Angle:Float, isEnemy:Bool, assetID: Int = 0)
     {
         super(X, Y);
 
@@ -23,7 +23,12 @@ class Projectile extends FlxSprite
         x -= width / 2;
         y -= height / 2;
         
-        this.angle = Angle + 90; // Angle sprite towards where its pointing
+        if(isEnemy == false) {
+            this.angle = Angle + 90; // Angle sprite towards where its pointing
+        }
+        else {
+            this.angle = Angle; //angle already calculated in PlayState
+        }
 
         // Set velocity and angle of projectile based on ship
         velocity.x = Math.cos(Angle * (Math.PI / 180)) * PROJECTILE_SPEED;
@@ -38,7 +43,6 @@ class Projectile extends FlxSprite
         if (!isOnScreen())
         {
             kill();
-
         }
     }
 }

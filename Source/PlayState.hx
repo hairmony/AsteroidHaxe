@@ -9,15 +9,20 @@ import flixel.util.FlxSpriteUtil;
 import flixel.text.FlxText;
 import flixel.ui.FlxButton;
 import flixel.util.FlxSave;
+import flixel.util.FlxTimer;
+import flixel.math.FlxAngle;
 
 class PlayState extends FlxState
 {
 	var ship:Player;
-	var asteroid:FlxGroup;//Make this a FlxGroup to spawn in multiple
+	var asteroid:FlxGroup;
 	var projectiles:FlxGroup;
+	var enemyProjectiles:FlxGroup;
 	var scoreText:FlxText;
 	var multishotText:FlxText; // New text to track multishot
 	var gameOverText:FlxText;
+	var enemy:FlxGroup;
+	var timer:FlxTimer;
 
 	// Score tracking variables
 	public var asteroidHits:Float = 0;
@@ -30,6 +35,10 @@ class PlayState extends FlxState
 	public static var MULTISHOT_CHARGE_MAX:Float = 20; // in number of objects killed
 	public static var MULTISHOT_SHOT_AMOUNT:Int = 6;
 	public static var ASTEROID_AMOUNT:Int = 5;
+
+	// Variables for enemies
+	public static var ENEMY_AMOUNT:Int = 3;
+	public static var SHOT_DELAY:Float = 0;
 	
 	// Pause menu variables
 	var isPaused:Bool = false;
@@ -79,6 +88,23 @@ class PlayState extends FlxState
 		// New projectile group
 		projectiles = new FlxGroup(); 
 		add(projectiles);
+
+		enemy = new FlxGroup();
+		add(enemy);
+
+		//Only spawns in 1 enemy for now
+		for(i in 0...ENEMY_AMOUNT){
+			var e = new Enemy();
+			enemy.add(e);
+		}
+
+		enemyProjectiles = new FlxGroup();
+		add(enemyProjectiles);
+
+		//create a timer that shoots an enemy projectile every 3 seconds
+		SHOT_DELAY = FlxG.random.float(-0.5, 0.5) + 3;
+		// Haxe
+		timer = new FlxTimer().start(SHOT_DELAY, enemyShot, 0);
 
 		// PAUSE MENU CODE
 
@@ -141,7 +167,7 @@ class PlayState extends FlxState
 				// Default: shoot 1 projectile with LMB
 				if (FlxG.mouse.justPressed)
 				{
-					var p = new Projectile(ship.getGraphicMidpoint().x, ship.getGraphicMidpoint().y, ship.angle - 90, 0);
+					var p = new Projectile(ship.getGraphicMidpoint().x, ship.getGraphicMidpoint().y, ship.angle - 90, false, 0);
 					projectiles.add(p); // Add projectile to group
 				}
 
@@ -155,7 +181,7 @@ class PlayState extends FlxState
 					for (i in 0...MULTISHOT_SHOT_AMOUNT)
 					{
 						// We use ship.angle here to base the shot direction on where the ship is facing
-						var p = new Projectile(ship.getGraphicMidpoint().x, ship.getGraphicMidpoint().y, ship.angle + angleIncrement, 1);
+						var p = new Projectile(ship.getGraphicMidpoint().x, ship.getGraphicMidpoint().y, ship.angle + angleIncrement, false, 1);
 						projectiles.add(p); // Add projectile to group
 						angleIncrement += (360/MULTISHOT_SHOT_AMOUNT);
 					}
@@ -163,15 +189,19 @@ class PlayState extends FlxState
 			}
         }
 
+        //Player collision
 		FlxG.overlap(asteroid, ship, collidePlayer);
+		FlxG.overlap(enemy, ship, collidePlayer);
+		
+		//Projectile collision
 		FlxG.overlap(asteroid, projectiles, collideProjectile); // Check for collisions between asteroids, projectiles
-		// FlxG.overlap(enemy, projectiles, collideProjectile); // For when enemy is added
+		FlxG.overlap(enemy, projectiles, collideProjectile); // For when enemy is added
+		FlxG.overlap(ship, enemyProjectiles, collideProjectile); //Check for collision between enemy projectile and player
 		}
 
 
 	function collidePlayer(object1:FlxObject, object2:FlxObject):Void
 	{
-		// object2.setPosition(50,50);
 		object2.kill();
 		gameOverText.visible = true;
 	}
@@ -189,11 +219,20 @@ class PlayState extends FlxState
 			asteroidHits++;
 		}
 		// Add in when we have Enemy objects
-		// else if (Std.isOfType(object1, Enemy))
-		// {
-		// 	// Add to the enemy kill count
-		// 	enemyHits++;
-		// }
+		else if (Std.isOfType(object1, Enemy))
+		{
+		 	var e = new Enemy();
+		 	enemy.add(e);
+
+		 	// Add to the enemy kill count
+		 	enemyHits++;
+
+		 	//REMOVE ENEMY FROM FLEX OBJECT TO NOT BREAK ENEMY SHOT CYCLE
+		 	enemy.remove(object1);
+		}
+		else { //player collides with enemy projectile
+			collidePlayer(object2, object1); //sends enemy projectile and ship
+		}
 
 		// Add to multishot charge when object is hit
 		if (multishotCharge < MULTISHOT_CHARGE_MAX)
@@ -224,6 +263,35 @@ class PlayState extends FlxState
 		scoreText.text = "Score: " + score;
 
 		return(score);
+	}
+
+	//I feel this can be optimized
+	function enemyShot(timer:FlxTimer): Void {
+		//Access all the enemy FlxGroup elements
+		for(i in enemy){
+			var temp:Enemy = cast(i, Enemy); //create a temporary Enemy object based of the inspected FlxGroup element
+			
+			//get the midpoint of the temporary enemy
+			var xC:Float = temp.getGraphicMidpoint().x;
+			var yC:Float = temp.getGraphicMidpoint().y;
+
+			//calculate the difference in position using getMidpoint for the enemy and player
+			var dX:Float = temp.getMidpoint().x - ship.getMidpoint().x;
+			var dY:Float = temp.getMidpoint().y - ship.getMidpoint().y;
+
+			//calculate the angle in degrees; - 180 is used to reverse the calculated angle
+			var targetAng:Float = Math.atan2(dY,dX) * (180 / Math.PI) - 180;
+
+			//Randomly adjust the shot by 2 degrees
+			targetAng += FlxG.random.float(-2.0, 2.0);
+
+			//create a new projectile with the calulated data
+			var ep = new Projectile(xC,yC,targetAng, true, 2);
+			enemyProjectiles.add(ep);
+		}
+
+		//reroll shot delay
+		SHOT_DELAY = FlxG.random.float(-0.5, 0.5) + 3;
 	}
 
 	function togglePause():Void

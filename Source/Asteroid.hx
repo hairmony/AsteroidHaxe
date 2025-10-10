@@ -34,7 +34,6 @@ class Asteroid extends FlxSprite {
 		if (!isOnScreen()){
 			y = 0;
 			x = FlxG.random.float(0.0,1.0) * (FlxG.width - 32);
-			velocity.x = FlxG.random.float(-50.0,50.0);
 		}
 	}
 }
