@@ -359,7 +359,7 @@ class PlayState extends FlxState
     	if (isPaused)
     	{
     		FlxG.sound.playMusic(null, 1, true);
-        	FlxG.switchState(MenuState.new);
+        	FlxG.switchState(MenuState.new); //Run time bug
     	}
     }
 }
