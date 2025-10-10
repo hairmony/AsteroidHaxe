@@ -7,6 +7,9 @@
 --macro openfl.utils._internal.ExtraParamsMacro.include()
 -cp C:/HaxeToolkit/haxe/lib/openfl/9,4,2/src
 -D openfl=9.4.2
+--macro keep('IntIterator')
+-cp C:/HaxeToolkit/haxe/lib/hscript/2,6,0
+-D hscript=2.6.0
 -cp Source
 -D lime-harfbuzz
 -D lime-openal

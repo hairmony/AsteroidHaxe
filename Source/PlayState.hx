@@ -18,8 +18,10 @@ class PlayState extends FlxState
 	var asteroid:FlxGroup;
 	var projectiles:FlxGroup;
 	var enemyProjectiles:FlxGroup;
+	var specialProjectiles:FlxGroup; // Separate special projectiles
 	var scoreText:FlxText;
 	var multishotText:FlxText; // New text to track multishot
+	var multishotControlsText:FlxText;
 	var gameOverText:FlxText;
 	public static var multiplierText:FlxText; //Set to static to be accessible from Enemy.hx
 	var enemy:FlxGroup;
@@ -39,8 +41,9 @@ class PlayState extends FlxState
 	public static var ASTEROID_AMOUNT:Int = 5;
 
 	// Variables for enemies
-	public static var ENEMY_AMOUNT:Int = 3;
-	public static var SHOT_DELAY:Float = 0;
+	public static var ENEMY_AMOUNT:Int = 4;
+	public static var ENEMY_SHOT_DELAY:Float = 1.0; // Shot delay is randomized between -ve and +ve of this value
+	var shotDelay:Float = 0;
 	
 	// Pause menu variables
 	var isPaused:Bool = false;
@@ -53,16 +56,15 @@ class PlayState extends FlxState
 		super.create();
 
 		//Create text
-		scoreText = new FlxText(25,25,0, "Score: " + score, 16); //add 5th argument as true if we are adding custom fonts
+		scoreText = new FlxText(25,25,0, "Score: " + score, 14); //add 5th argument as true if we are adding custom fonts
 		add(scoreText);
 
-		multishotText = new FlxText(25,45,0, "Super: " + multishotCharge + "/" + MULTISHOT_CHARGE_MAX, 16);
+		multishotText = new FlxText(25,45,0, "Super: " + multishotCharge + "/" + MULTISHOT_CHARGE_MAX, 14);
 		add(multishotText);
 
-		multiplierText = new FlxText(25, 65, 0, MULTIPLIER + "X", 16);
+		multiplierText = new FlxText(25, 65, 0, MULTIPLIER + "x", 14);
 		multiplierText.visible = false;
 		add(multiplierText);
-
 
 		gameOverText = new FlxText(0, FlxG.height / 2, FlxG.width, "Transmission Lost", 32);
         gameOverText.alignment = CENTER;
@@ -72,9 +74,11 @@ class PlayState extends FlxState
         // Ship select from save file
         var save = new FlxSave();
 		save.bind("LeftAligned");
+
 		var shipAsset:Int = 0; // Default to 0
 		if (save.data.shipChoice != null)
 			shipAsset = save.data.shipChoice;
+
 		save.close();
 		
 		// Spawn in player
@@ -85,19 +89,6 @@ class PlayState extends FlxState
 		ship.x = FlxG.width / 2;
 		ship.y = FlxG.height - 50;
 
-		// Spawn in stationary test asteroid
-		asteroid = new FlxGroup();
-		add(asteroid);
-
-		for(i in 0...ASTEROID_AMOUNT) {
-			var a = new Asteroid();
-			asteroid.add(a);
-		}
-
-		// New projectile group
-		projectiles = new FlxGroup(); 
-		add(projectiles);
-
 		//Create enemy group
 		enemy = new FlxGroup();
 		add(enemy);
@@ -107,13 +98,35 @@ class PlayState extends FlxState
 			enemy.add(e);
 		}
 
+		// Spawn in stationary test asteroid
+		asteroid = new FlxGroup();
+		add(asteroid);
+
+		for(i in 0...ASTEROID_AMOUNT) {
+			var a = new Asteroid();
+			asteroid.add(a);
+		}
+
 		//Create a seperate projectiles group for enemy projectiles
 		enemyProjectiles = new FlxGroup();
 		add(enemyProjectiles);
 
+		// New projectile group
+		projectiles = new FlxGroup(); 
+		add(projectiles);
+
+		specialProjectiles = new FlxGroup();
+		add(specialProjectiles);
+
+		multishotControlsText = new FlxText(0, FlxG.height - 32, 0, "SPACE to Super", 12);
+		multishotControlsText.alignment = CENTER;
+		multishotControlsText.screenCenter(X);
+		multishotControlsText.visible = false;
+		add(multishotControlsText);
+
 		//create a timer that shoots an enemy projectile every 3 seconds
-		SHOT_DELAY = FlxG.random.float(-0.5, 0.5) + 3;
-		timer = new FlxTimer().start(SHOT_DELAY, enemyShot, 0);
+		shotDelay = FlxG.random.float(-ENEMY_SHOT_DELAY, ENEMY_SHOT_DELAY) + 3;
+		timer = new FlxTimer().start(shotDelay, enemyShot, 0);
 
 		// PAUSE MENU CODE
 
@@ -138,12 +151,12 @@ class PlayState extends FlxState
         pauseGroup.add(btnContinue);
 
         // Restart button
-        var btnRestart = new FlxButton(0, 260, "Restart", onRestart);
+        var btnRestart = new FlxButton(0, btnContinue.y + 25, "Restart", onRestart);
         btnRestart.screenCenter(X);
         pauseGroup.add(btnRestart);
 
         // Exit button
-        var btnExit = new FlxButton(0, 320, "Exit", onExit);
+        var btnExit = new FlxButton(0, btnRestart.y + 25, "Exit", onExit);
         btnExit.screenCenter(X);
         pauseGroup.add(btnExit);
 	}
@@ -158,7 +171,7 @@ class PlayState extends FlxState
 		// Reset button
 		if (FlxG.keys.justPressed.R)
 		{
-			MULTIPLIER = 1;
+			// MULTIPLIER = 1;
 			FlxG.resetState(); // Reset with R key
 		}
 
@@ -186,31 +199,37 @@ class PlayState extends FlxState
 				{
 					// Reset the cooldown
 					multishotCharge = 0;
+					multishotControlsText.visible = false;
 
 					var angleIncrement:Float = 0;
 					for (i in 0...MULTISHOT_SHOT_AMOUNT)
 					{
 						// We use ship.angle here to base the shot direction on where the ship is facing
 						var p = new Projectile(ship.getGraphicMidpoint().x, ship.getGraphicMidpoint().y, ship.angle + angleIncrement, false, 1);
-						projectiles.add(p); // Add projectile to group
+						specialProjectiles.add(p); // Add projectile to group
 						angleIncrement += (360/MULTISHOT_SHOT_AMOUNT);
 					}
 
-					multishotText.text = "Super: " + multishotCharge + "/" + MULTISHOT_CHARGE_MAX;
+					updateMultishotText();
 				}
 			}
         }
 
-        //Player collision
+	    // Player collision
 		FlxG.overlap(asteroid, ship, collidePlayer);
 		FlxG.overlap(enemy, ship, collidePlayer);
+		FlxG.overlap(enemyProjectiles, ship, collidePlayer); //Check for collision between enemy projectile and player
 		
-		//Projectile collision
+		// Projectile collision
 		FlxG.overlap(asteroid, projectiles, collideProjectile); // Check for collisions between asteroids, projectiles
 		FlxG.overlap(enemy, projectiles, collideProjectile); // For when enemy is added
-		FlxG.overlap(ship, enemyProjectiles, collideProjectile); //Check for collision between enemy projectile and player
-		}
+		FlxG.overlap(enemyProjectiles, specialProjectiles, collideProjectile);
 
+		// Special Projectile collision
+		FlxG.overlap(asteroid, specialProjectiles, collideProjectile); // Check for collisions between asteroids, projectiles
+		FlxG.overlap(enemy, specialProjectiles, collideProjectile); // For when enemy is added
+	}
+ 
 
 	function collidePlayer(object1:FlxObject, object2:FlxObject):Void
 	{
@@ -233,17 +252,14 @@ class PlayState extends FlxState
 		// Add in when we have Enemy objects
 		else if (Std.isOfType(object1, Enemy))
 		{
+			// Add to the enemy kill count
+		 	enemyHits++;
+
 		 	var e = new Enemy();
 		 	enemy.add(e);
 
-		 	// Add to the enemy kill count
-		 	enemyHits++;
-
 		 	//REMOVE ENEMY FROM FLEX OBJECT TO NOT BREAK ENEMY SHOT CYCLE
 		 	enemy.remove(object1);
-		}
-		else { //player collides with enemy projectile
-			collidePlayer(object2, object1); //sends enemy projectile and ship
 		}
 
 		// Add to multishot charge when object is hit
@@ -253,7 +269,6 @@ class PlayState extends FlxState
 			updateMultishotText(); // Update the display
 		}
 
-		// Kill both the asteroid and the projectile
 		object1.kill();
 		object2.kill();
 
@@ -263,13 +278,15 @@ class PlayState extends FlxState
 
 	function updateMultishotText():Void
 	{
+		if (multishotCharge >= MULTISHOT_CHARGE_MAX)
+			multishotControlsText.visible = true;
+		
 		multishotText.text = "Super: " + multishotCharge + "/" + MULTISHOT_CHARGE_MAX;
 	}
 
 	// Function calculates score for player
 	function updateScoreText():Float
 	{
-		// Currently DOES NOT track multiplier bonuses
 		// Add code here for multiplier
 		if (enemyHits % 5 == 0){
 			if (MULTIPLIER < 5){
@@ -312,7 +329,7 @@ class PlayState extends FlxState
 		}
 
 		//reroll shot delay
-		SHOT_DELAY = FlxG.random.float(-0.5, 0.5) + 3;
+		shotDelay = FlxG.random.float(-ENEMY_SHOT_DELAY, ENEMY_SHOT_DELAY) + 3;
 	}
 
 	function togglePause():Void
