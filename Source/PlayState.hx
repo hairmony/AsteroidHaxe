@@ -62,9 +62,10 @@ class PlayState extends FlxState
 		multishotText = new FlxText(25,45,0, "Super: " + multishotCharge + "/" + MULTISHOT_CHARGE_MAX, 14);
 		add(multishotText);
 
-		multiplierText = new FlxText(25, 65, 0, MULTIPLIER + "x", 14);
+		multiplierText = new FlxText(25, 65, 0, MULTIPLIER + "X", 16);
 		multiplierText.visible = false;
 		add(multiplierText);
+
 
 		gameOverText = new FlxText(0, FlxG.height / 2, FlxG.width, "Transmission Lost", 32);
         gameOverText.alignment = CENTER;
@@ -74,11 +75,9 @@ class PlayState extends FlxState
         // Ship select from save file
         var save = new FlxSave();
 		save.bind("LeftAligned");
-
 		var shipAsset:Int = 0; // Default to 0
 		if (save.data.shipChoice != null)
 			shipAsset = save.data.shipChoice;
-
 		save.close();
 		
 		// Spawn in player
@@ -89,7 +88,6 @@ class PlayState extends FlxState
 		ship.x = FlxG.width / 2;
 		ship.y = FlxG.height - 50;
 
-		//Create enemy group
 		enemy = new FlxGroup();
 		add(enemy);
 
@@ -107,7 +105,6 @@ class PlayState extends FlxState
 			asteroid.add(a);
 		}
 
-		//Create a seperate projectiles group for enemy projectiles
 		enemyProjectiles = new FlxGroup();
 		add(enemyProjectiles);
 
@@ -126,6 +123,8 @@ class PlayState extends FlxState
 
 		//create a timer that shoots an enemy projectile every 3 seconds
 		shotDelay = FlxG.random.float(-ENEMY_SHOT_DELAY, ENEMY_SHOT_DELAY) + 3;
+		
+		// Haxe
 		timer = new FlxTimer().start(shotDelay, enemyShot, 0);
 
 		// PAUSE MENU CODE
@@ -171,7 +170,7 @@ class PlayState extends FlxState
 		// Reset button
 		if (FlxG.keys.justPressed.R)
 		{
-			// MULTIPLIER = 1;
+			MULTIPLIER = 1;
 			FlxG.resetState(); // Reset with R key
 		}
 
@@ -210,7 +209,7 @@ class PlayState extends FlxState
 						angleIncrement += (360/MULTISHOT_SHOT_AMOUNT);
 					}
 
-					updateMultishotText();
+					multishotText.text = "Super: " + multishotCharge + "/" + MULTISHOT_CHARGE_MAX;
 				}
 			}
         }
@@ -287,6 +286,7 @@ class PlayState extends FlxState
 	// Function calculates score for player
 	function updateScoreText():Float
 	{
+		// Currently DOES NOT track multiplier bonuses
 		// Add code here for multiplier
 		if (enemyHits % 5 == 0){
 			if (MULTIPLIER < 5){
@@ -359,7 +359,7 @@ class PlayState extends FlxState
     	if (isPaused)
     	{
     		FlxG.sound.playMusic(null, 1, true);
-        	FlxG.switchState(MenuState.new);
+        	FlxG.switchState(MenuState.new); //Run time bug
     	}
     }
 }

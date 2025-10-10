@@ -5,8 +5,7 @@ import flixel.FlxG;
 import flixel.group.FlxGroup;
 import flixel.util.FlxSpriteUtil;
 
-class Enemy extends FlxSprite 
-{
+class Enemy extends FlxSprite {
 	public static var ENEMY_SPEED:Int = 55; //Default value
 	var initX:Float;//used to track the inital x coordinate of the enemy
 	var spawnSide:Int; // Tracks if it spawned on left = 0 or right = 1
@@ -61,28 +60,33 @@ class Enemy extends FlxSprite
 		// }
 
 		// When enemy goes off the opposite side it spawn, bring back to spawn
-        if (x + width < 0 || x > FlxG.width) {
-            // respawn on same side it originally came from
-            y = FlxG.random.float(0.0,1.0) * (FlxG.height - 32);
+      if (x + width < 0 || x > FlxG.width) {
+          // respawn on same side it originally came from
+          y = FlxG.random.float(0.0,1.0) * (FlxG.height - 32);
 
-            if (spawnSide == 0) {
-                x = FlxG.width;
-                velocity.x = -ENEMY_SPEED;
-            } else {
-                x = -32; 
-                velocity.x = ENEMY_SPEED;
-            }
-        }
+          if (spawnSide == 0) {
+              x = FlxG.width;
+              velocity.x = -ENEMY_SPEED;
+          } else {
+              x = -32; 
+              velocity.x = ENEMY_SPEED;
+          }
+      }
+		
+// 		if (!isOnScreen()) {
+// 			y = FlxG.random.float(0.0,1.0) * (FlxG.height - 32);
+// 			x = initX; //reset back to initial x
 
-        if(PlayState.MULTIPLIER > 1)
-        {
+			//
+			if(PlayState.MULTIPLIER > 1)
+      {
 				PlayState.MULTIPLIER--;
 				PlayState.multiplierText.text = PlayState.MULTIPLIER + "X";
 				if(PlayState.MULTIPLIER == 1)
-				{
+        {
 					PlayState.multiplierText.visible = false;
 				}
+			}
 		}
-		
 	}
 }
