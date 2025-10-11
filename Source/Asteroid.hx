@@ -19,7 +19,7 @@ class Asteroid extends FlxSprite {
         };
 
 		loadGraphic(asset, false);
-
+		
 		x = FlxG.random.float(0.0,1.0) * (FlxG.width - 32);
 		y = 0; //Always spawn at the top
 

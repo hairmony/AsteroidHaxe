@@ -8,6 +8,7 @@ import flixel.util.FlxSpriteUtil;
 class Enemy extends FlxSprite 
 {
 	public static var ENEMY_SPEED:Int = 55; //Default value
+	
 	var initX:Float;//used to track the inital x coordinate of the enemy
 	var spawnSide:Int; // Tracks if it spawned on left = 0 or right = 1
 

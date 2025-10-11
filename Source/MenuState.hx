@@ -50,7 +50,7 @@ class MenuState extends FlxState
         // Add background to state
         add(bg);
 
-        titleText = new FlxText(25, FlxG.height * 0.25, FlxG.width, "Left: ALIGNED");
+        titleText = new FlxText(25, FlxG.height * 0.25, FlxG.width, "Left: ALIENED");
 		titleText.setFormat(null, 32, 0xffffff, "left"); // Set font size, color, and alignment
 		add(titleText);
 
@@ -72,7 +72,7 @@ class MenuState extends FlxState
 	function cycleShipChoice()
 	{
 		currentShipNumber++;
-		if (currentShipNumber >= SHIP_MAX - 1)
+		if (currentShipNumber >= SHIP_MAX)
 		{
 			currentShipNumber = 0; // Wrap around to the first ship
 		}
@@ -92,7 +92,6 @@ class MenuState extends FlxState
 
 	function updateShipButtonText()
 	{
-		// We add 1 to the index to show "Ship: 1" instead of "Ship: 0"
 		shipButton.text = "Ship: " + (currentShipNumber + 1);
 		shipButton.screenCenter(X); // Recenter the button after text changes
 	}
