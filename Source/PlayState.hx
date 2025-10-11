@@ -12,6 +12,7 @@ import flixel.ui.FlxButton;
 import flixel.util.FlxSave;
 import flixel.util.FlxTimer;
 import flixel.math.FlxAngle;
+import flixel.util.FlxColor;
 
 class PlayState extends FlxState
 {
@@ -62,11 +63,13 @@ class PlayState extends FlxState
 
 	// Wave mode variables
 	var boss:Boss;
-	var currentWave:Int = 0;
+	var currentWave:Int = -1;
 	var enemiesToSpawn:Int = 0;
 	var asteroidsToSpawn:Int = 0;
 	var waveText:FlxText;
 	var isSpawning:Bool = false;
+	var enemiesToSpawnForWave:Int = 0;
+	var asteroidsToSpawnForWave:Int = 0;
 
 	public var FINAL_WAVE:Int = 12;
 	
@@ -192,6 +195,15 @@ class PlayState extends FlxState
 
 		multiplierText.text = MULTIPLIER + "x"; // Always show
 		multiplierText.visible = true;
+
+		if (MULTIPLIER == MULTIPLIER_MAX)
+	    {
+	        multiplierText.color = FlxColor.RED; // Set to red when at max
+	    }
+	    else
+	    {
+	        multiplierText.color = FlxColor.WHITE; // Set back to white otherwise
+	    }
 
 		// Debug controls
 		if (FlxG.keys.justPressed.RBRACKET) // press ] kill all enemies
@@ -397,14 +409,15 @@ class PlayState extends FlxState
 		if (isgameOver)
 			return;
 
+		currentWave++;
 		isSpawning = true;
 
 		// Flash wave text on screen
 		waveText.visible = true;
 		new FlxTimer().start(2.0, function(timer:FlxTimer){waveText.visible = false;});
 
-		var enemiesToSpawn:Int = 0;
-		var asteroidsToSpawn:Int = 0;
+		enemiesToSpawn = 0;
+		asteroidsToSpawn = 0;
 
 		if (currentWave == 0)
 	    {
@@ -486,14 +499,14 @@ class PlayState extends FlxState
 	        waveText.text = "Enemy Leader Awakened...";
 	        spawnBoss(0, 1);
 	    }
-	    else // when game ends
-	    {
-	        if (boss == null || !boss.alive)
-	        {
-	            gameWonText.visible = true;
-	            isgameOver = true;
-	        }
-	    }
+	    // else // when game ends
+	    // {
+	    //     if (boss == null || !boss.alive)
+	    //     {
+	    //         gameWonText.visible = true;
+	    //         isgameOver = true;
+	    //     }
+	    // }
 
 		// Spawn enemies and asteroids
 		if (enemiesToSpawn > 0) // for some reason FlxTimer loops inf times if the value is 0
@@ -532,8 +545,6 @@ class PlayState extends FlxState
 			// If nothing is spawning (like a boss wave), set the flag immediately.
 			isSpawning = false;
 		}
-
-		currentWave++;
 	}
 
 	function spawnBoss(assetID:Int = 0, bossType:Int = 0):Void
@@ -551,7 +562,10 @@ class PlayState extends FlxState
 		if (isSpawning || isgameOver)
 			return;
 
-		if (ship.alive && enemy.countLiving() == 0 && asteroid.countLiving() <= 4 && (boss == null || !boss.alive))
+		var isEnemiesDead = (enemiesToSpawn == 0) || (enemy.countLiving() == 0);
+    	var isAsteroidsDead = (asteroidsToSpawn == 0) || (asteroid.countLiving() <= 4);
+
+		if (ship.alive && isEnemiesDead && isAsteroidsDead && (boss == null || !boss.alive))
 		{
 			startWave();
 		}
