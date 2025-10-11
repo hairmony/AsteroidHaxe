@@ -3,9 +3,13 @@ package;
 import flixel.FlxState;
 import flixel.ui.FlxButton;
 import flixel.FlxG;
+import flixel.FlxSubState;
 import flixel.FlxSprite;
 import flixel.text.FlxText;
 import flixel.util.FlxSave;
+import lime.system.System;
+import flixel.util.FlxColor;
+
 
 
 class MenuState extends FlxState
@@ -13,9 +17,11 @@ class MenuState extends FlxState
 	var bg:FlxSprite;
 	var titleText:FlxText; // Variable for the title
 
-	public var shipButton:FlxButton;
-	public var currentShipNumber:Int = 0;
-	public static var SHIP_MAX = 3;
+	//Options menu
+	private function optionsMenu():Void
+	{
+		openSubState(new OptionsState());
+	}
 
 	function scaleBackgroundToCover(sprite:FlxSprite, targetWidth:Int, targetHeight:Int):Void
     {
@@ -59,9 +65,18 @@ class MenuState extends FlxState
 		add(playButton);
 		playButton.screenCenter();
 
-		shipButton = new FlxButton(0, playButton.y + 25, "", cycleShipChoice);
-		add(shipButton);
-		updateShipButtonText(); // Set the initial text
+		var optionsButton:FlxButton;
+		optionsButton = new FlxButton(playButton.x , playButton.y + 25, "Options", optionsMenu);
+		add(optionsButton);
+
+		var closeButton:FlxButton;
+		closeButton = new FlxButton(optionsButton.x , optionsButton.y + 25, "Exit", closeGame);
+		add(closeButton);
+
+	}
+
+	function closeGame(){
+		System.exit(0);
 	}
 
 	function clickPlay()
@@ -69,32 +84,6 @@ class MenuState extends FlxState
 		FlxG.switchState(PlayState.new);
 	}
 
-	function cycleShipChoice()
-	{
-		currentShipNumber++;
-		if (currentShipNumber >= SHIP_MAX)
-		{
-			currentShipNumber = 0; // Wrap around to the first ship
-		}
-
-		saveShipChoice();
-		updateShipButtonText();
-	}
-
-	function saveShipChoice()
-	{
-		var save = new FlxSave();
-		save.bind("LeftAligned");
-		save.data.shipChoice = currentShipNumber;
-		save.flush(); // Immediately write the data to the file
-		save.close();
-	}
-
-	function updateShipButtonText()
-	{
-		shipButton.text = "Ship: " + (currentShipNumber + 1);
-		shipButton.screenCenter(X); // Recenter the button after text changes
-	}
 
 	override public function update(elapsed:Float)
 	{
@@ -106,4 +95,115 @@ class MenuState extends FlxState
 			bg.y = (FlxG.height - bg.height) / 2;
 		}
 	}
+}
+
+class OptionsState extends FlxSubState
+{
+	public var bg:FlxSprite;
+	public var shipPreview:FlxSprite;
+	public var shipPreviewBG:FlxSprite;		
+	public var shipButton:FlxButton;
+	public var currentShipNumber:Int = 0;
+	public static var SHIP_MAX = 3;
+
+	public function new()
+	{
+		super();
+
+		bg = new FlxSprite();
+        bg.loadGraphic("assets/images/MenuBackground.png", false, 0, 0, false);
+        add(bg);
+    }
+	
+	override function create()
+	{
+		super.create();
+
+		shipButton = new FlxButton(0, 0 , "", cycleShipChoice);
+		add(shipButton);
+		shipButton.screenCenter();
+		updateShipButtonText(); // Set the initial text
+
+		var backButton:FlxButton;
+		backButton = new FlxButton(0, shipButton.y + 25 , "Back", backToMenu);
+		backButton.screenCenter(X);
+		add(backButton);
+
+		shipPreviewBG = new FlxSprite();
+		shipPreviewBG.makeGraphic(70,70, FlxColor.WHITE);
+		shipPreviewBG.screenCenter(X);
+		shipPreviewBG.y=shipButton.y - 95;
+		add(shipPreviewBG);
+
+		shipPreview = new FlxSprite();
+		shipPreview.loadGraphic(previewShip(),false, 0 ,0 );
+		shipPreview.scale.set(2,2);
+		shipPreview.screenCenter(X);
+		shipPreview.y=shipButton.y - 75;
+		add(shipPreview);
+
+
+	}
+
+		function previewShip():String
+		{
+			var save = new FlxSave();
+			save.bind("LeftAliened");
+			var asset:String;
+			switch(save.data.shipChoice)
+			{
+	            case 0: asset = "assets/images/Ship.png";
+	            case 1: asset = "assets/images/Ship2.png";
+	            case 2: asset = "assets/images/Ship3.png";
+	            case 3: asset = "assets/images/Ship4.png";
+	            default: asset = "assets/images/Ship.png";
+	        }
+	        return asset;
+	    }
+
+		function backToMenu()
+		{
+			close();
+		}
+
+		function cycleShipChoice()
+		{
+			currentShipNumber++;
+			if (currentShipNumber >= SHIP_MAX)
+			{
+				currentShipNumber = 0; // Wrap around to the first ship
+			}
+
+			saveShipChoice();
+			updateShipButtonText();
+			shipPreview.kill();
+			shipPreview.loadGraphic(previewShip(),false, 0 ,0 );
+			shipPreview.revive();
+		}
+
+		function saveShipChoice()
+		{
+			var save = new FlxSave();
+			save.bind("LeftAliened");
+			save.data.shipChoice = currentShipNumber;
+			save.flush(); // Immediately write the data to the file
+			save.close();
+		}
+
+		function updateShipButtonText()
+		{
+			var save = new FlxSave();
+			save.bind("LeftAliened");
+			if (save.data.shipChoice != null)
+			{
+				currentShipNumber = save.data.shipChoice;
+				shipButton.text = "Ship: " + (currentShipNumber + 1);
+				save.close();
+			}
+			else
+			{
+			shipButton.text = "Ship: " + (currentShipNumber + 1);
+			shipButton.screenCenter(X); // Recenter the button after text changes
+			}
+		}
 }
