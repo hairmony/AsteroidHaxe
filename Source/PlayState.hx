@@ -7,6 +7,7 @@ import flixel.FlxSprite;
 import flixel.group.FlxGroup;
 import flixel.util.FlxSpriteUtil;
 import flixel.text.FlxText;
+import flixel.FlxSubState;
 import flixel.ui.FlxButton;
 import flixel.util.FlxSave;
 import flixel.util.FlxTimer;
@@ -69,16 +70,20 @@ class PlayState extends FlxState
 	public var FINAL_WAVE:Int = 12;
 	
 	// Pause menu variables
-	var isPaused:Bool = false;
-    var pauseGroup:FlxGroup;
-    var pauseText:FlxText;
+	private function pausemenu():Void
+	{
+		openSubState(new PauseState());
+	}
+	// var isPaused:Bool = false;
+    // var pauseGroup:FlxGroup;
+    // var pauseText:FlxText;
 
 	override public function create():Void
 	{
 		MULTIPLIER = 1;
 		multiplierTimer = 0;
 
-		FlxG.sound.playMusic("assets/music/LevelMusic.ogg", 1, true);
+		FlxG.sound.playMusic("assets/music/Levelmusic.ogg", 1, true);
 		super.create();
 
 		//Create text
@@ -169,34 +174,10 @@ class PlayState extends FlxState
 		// PAUSE MENU CODE
 
 		// Create pause menu group but keep it hidden initially
-        pauseGroup = new FlxGroup();
-        pauseGroup.visible = false;
-        add(pauseGroup);
+        // pauseGroup = new FlxGroup();
+        // pauseGroup.visible = false;
+        // add(pauseGroup);
 
-        // Dim background
-        var bg = new FlxSprite();
-        bg.makeGraphic(FlxG.width, FlxG.height, 0x88000000);
-        pauseGroup.add(bg);
-
-        // “PAUSED” text
-        var pauseText = new FlxText(0, 100, FlxG.width, "PAUSED");
-        pauseText.setFormat(null, 32, 0xFFFFFFFF, "center");
-        pauseGroup.add(pauseText);
-
-        // Continue button
-        var btnContinue = new FlxButton(0, 200, "Continue", onContinue);
-        btnContinue.screenCenter(X);
-        pauseGroup.add(btnContinue);
-
-        // Restart button
-        var btnRestart = new FlxButton(0, btnContinue.y + 25, "Restart", onRestart);
-        btnRestart.screenCenter(X);
-        pauseGroup.add(btnRestart);
-
-        // Exit button
-        var btnExit = new FlxButton(0, btnRestart.y + 25, "Exit", onExit);
-        btnExit.screenCenter(X);
-        pauseGroup.add(btnExit);
 	}
 
 	override public function update(elapsed:Float):Void
@@ -229,14 +210,13 @@ class PlayState extends FlxState
 			FlxG.resetState(); // Reset with R key
 		}
 
+
 		if (FlxG.keys.justPressed.ESCAPE)
         {
-            togglePause();
+        	pausemenu();
         }
 
         // Only run gameplay updates if NOT paused
-        if (!isPaused)
-        {
             // your normal gameplay code goes here (player movement, collisions, etc.)
             fireTimer += elapsed;
 
@@ -289,7 +269,6 @@ class PlayState extends FlxState
 					updateMultishotText();
 				}
 			}
-        }
 
 	    // Player collision
 		FlxG.overlap(asteroid, ship, collidePlayer);
@@ -594,34 +573,69 @@ class PlayState extends FlxState
 		shotDelay = FlxG.random.float(-ENEMY_SHOT_DELAY, ENEMY_SHOT_DELAY) + 3;
 	}
 
-	function togglePause():Void
-    {
-        isPaused = !isPaused;
-        pauseGroup.visible = isPaused;
-    }
+	
 
-    function onContinue():Void
-    {
-    	if (isPaused) 
-    	{
-        	togglePause();
-    	}
-    }
 
-    function onRestart():Void
-    {
-    	if (isPaused)
-    	{
-        	FlxG.resetState();
-        }
-    }
 
-    function onExit():Void
-    {
-    	if (isPaused)
-    	{
-    		FlxG.sound.playMusic(null, 1, true);
-        	FlxG.switchState(MenuState.new); //Run time bug
-    	}
-    }
+	// function togglePause():Void
+    // {
+    //     isPaused = !isPaused;
+    //     pauseGroup.visible = isPaused;
+    // }
+
+
 }
+
+	class PauseState extends FlxSubState
+		{
+		public function new(){
+			super(0x33000000);
+		}
+
+		override function create()
+		{
+			super.create();
+
+	        function onContinue():Void
+		    {
+		    	close();
+		    }
+
+		    function onRestart():Void
+		    {
+		    	FlxG.resetState();
+		    }
+
+		    function onExit():Void
+		    {
+		    	FlxG.sound.playMusic(null, 1, true);
+		    	FlxG.switchState(MenuState.new); //Run time bug
+		    }			
+
+			// Dim background
+	        // var bg = new FlxSprite();
+	        // bg.makeGraphic(FlxG.width, FlxG.height, 0x88000000);
+	        // pauseGroup.add(bg);
+
+	        // “PAUSED” text
+	        var pauseText = new FlxText(0, 100, FlxG.width, "PAUSED");
+	        pauseText.setFormat(null, 32, 0xFFFFFFFF, "center");
+	        add(pauseText);
+
+	        // Continue button
+	        var btnContinue = new FlxButton(0, 200, "Continue", onContinue);
+	        btnContinue.screenCenter(X);
+	        add(btnContinue);
+
+	        // Restart button
+	        var btnRestart = new FlxButton(0, btnContinue.y + 25, "Restart", onRestart);
+	        btnRestart.screenCenter(X);
+	        add(btnRestart);
+
+	        // Exit button
+	        var btnExit = new FlxButton(0, btnRestart.y + 25, "Exit", onExit);
+	        btnExit.screenCenter(X);
+	        add(btnExit);
+
+		}
+	}

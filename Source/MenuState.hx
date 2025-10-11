@@ -36,7 +36,7 @@ class MenuState extends FlxState
 	{
 		super.create();
 
-		FlxG.sound.playMusic("assets/music/MenuMusic.ogg", 1, true);
+		FlxG.sound.playMusic("assets/music/Menumusic.ogg", 1, true);
 
 		bg = new FlxSprite();
         bg.loadGraphic("assets/images/MenuBackground.png", false, 0, 0, false);
