@@ -66,6 +66,7 @@ class PlayState extends FlxState
 	var enemiesToSpawn:Int = 0;
 	var asteroidsToSpawn:Int = 0;
 	var waveText:FlxText;
+	var isSpawning:Bool = false;
 
 	public var FINAL_WAVE:Int = 12;
 	
@@ -74,6 +75,7 @@ class PlayState extends FlxState
 	{
 		openSubState(new PauseState());
 	}
+
 	// var isPaused:Bool = false;
     // var pauseGroup:FlxGroup;
     // var pauseText:FlxText;
@@ -83,7 +85,7 @@ class PlayState extends FlxState
 		MULTIPLIER = 1;
 		multiplierTimer = 0;
 
-		FlxG.sound.playMusic("assets/music/Levelmusic.ogg", 1, true);
+		FlxG.sound.playMusic("assets/music/LevelMusic.ogg", 1, true);
 		super.create();
 
 		//Create text
@@ -170,6 +172,7 @@ class PlayState extends FlxState
 
 		// Wave start
 		startWave();
+		updateScoreText();
 
 		// PAUSE MENU CODE
 
@@ -189,6 +192,29 @@ class PlayState extends FlxState
 
 		multiplierText.text = MULTIPLIER + "x"; // Always show
 		multiplierText.visible = true;
+
+		// Debug controls
+		if (FlxG.keys.justPressed.RBRACKET) // press ] kill all enemies
+		{
+		for (e in enemy)
+		    {
+		        e.kill(); // Kill all enemies
+		    }
+		    for (a in asteroid)
+		    {
+		    	a.kill();
+		    }
+		    if (boss != null && boss.alive)
+		    {
+		        boss.kill(); // Kill all bosses
+		    }
+		    isWaveComplete();
+		}
+		if (FlxG.keys.justPressed.LBRACKET) // Press [ respawn
+		{
+			ship.reset(FlxG.width / 2, FlxG.height - 50);
+			gameOverText.visible = false;
+		}
 
 		// Handle multiplier countdown
 		if(MULTIPLIER > 1)
@@ -217,58 +243,39 @@ class PlayState extends FlxState
         }
 
         // Only run gameplay updates if NOT paused
-            // your normal gameplay code goes here (player movement, collisions, etc.)
-            fireTimer += elapsed;
+        // your normal gameplay code goes here (player movement, collisions, etc.)
+        fireTimer += elapsed;
 
-            if (ship.alive) // Ship controls disabled if ship is dead
+        if (ship.alive) // Ship controls disabled if ship is dead
+		{
+			// Default: shoot 1 projectile with LMB or hold LMB
+			if ((FlxG.mouse.pressed && fireTimer >= fireRate) || FlxG.mouse.justPressed)
 			{
-				// Debug controls
-				// press ] kill all enemies
-				if (FlxG.keys.justPressed.RBRACKET)
-				{
-				    for (e in enemy)
-				    {
-				        e.kill(); // Kill all enemies
-				    }
-				    for (a in asteroid)
-				    {
-				    	a.kill();
-				    }
-				    if (boss != null && boss.alive)
-				    {
-				        boss.kill(); // Kill all bosses
-				    }
-				    isWaveComplete();
-				}
+				fireTimer = 0;
 
-				// Default: shoot 1 projectile with LMB or hold LMB
-				if ((FlxG.mouse.pressed && fireTimer >= fireRate) || FlxG.mouse.justPressed)
-				{
-					fireTimer = 0;
-
-					var p = new Projectile(ship.getGraphicMidpoint().x, ship.getGraphicMidpoint().y, ship.angle - 90, 0, 0);
-					projectiles.add(p); // Add projectile to group
-				}
-
-				// Multishot: shoot 8 projectiles in a circle
-				if (FlxG.keys.justPressed.SPACE && multishotCharge >= MULTISHOT_CHARGE_MAX)
-				{
-					// Reset the cooldown
-					multishotCharge = 0;
-					multishotControlsText.visible = false;
-
-					var angleIncrement:Float = 0;
-					for (i in 0...MULTISHOT_SHOT_AMOUNT)
-					{
-						// We use ship.angle here to base the shot direction on where the ship is facing
-						var p = new Projectile(ship.getGraphicMidpoint().x, ship.getGraphicMidpoint().y, ship.angle + angleIncrement, 0, 1);
-						specialProjectiles.add(p); // Add projectile to group
-						angleIncrement += (360/MULTISHOT_SHOT_AMOUNT);
-					}
-
-					updateMultishotText();
-				}
+				var p = new Projectile(ship.getGraphicMidpoint().x, ship.getGraphicMidpoint().y, ship.angle - 90, 0, 0);
+				projectiles.add(p); // Add projectile to group
 			}
+
+			// Multishot: shoot 8 projectiles in a circle
+			if (FlxG.keys.justPressed.SPACE && multishotCharge >= MULTISHOT_CHARGE_MAX)
+			{
+				// Reset the cooldown
+				multishotCharge = 0;
+				multishotControlsText.visible = false;
+
+				var angleIncrement:Float = 0;
+				for (i in 0...MULTISHOT_SHOT_AMOUNT)
+				{
+					// We use ship.angle here to base the shot direction on where the ship is facing
+					var p = new Projectile(ship.getGraphicMidpoint().x, ship.getGraphicMidpoint().y, ship.angle + angleIncrement, 0, 1);
+					specialProjectiles.add(p); // Add projectile to group
+					angleIncrement += (360/MULTISHOT_SHOT_AMOUNT);
+				}
+
+				updateMultishotText();
+			}
+		}
 
 	    // Player collision
 		FlxG.overlap(asteroid, ship, collidePlayer);
@@ -308,6 +315,8 @@ class PlayState extends FlxState
 		object1.kill();
 		object2.kill();
 
+		var pointsAdd:Int = 0;
+
 		// Check if the object is an Asteroid
 		if (Std.isOfType(object1, Asteroid))
 		{
@@ -315,6 +324,7 @@ class PlayState extends FlxState
 			// asteroid.add(a);
 			// Add to asteroid kill count
 			asteroidHits++;
+			pointsAdd = 100;
 		}
 		// Add in when we have Enemy objects
 		else if (Std.isOfType(object1, Enemy))
@@ -322,6 +332,9 @@ class PlayState extends FlxState
 			// Add to the enemy kill count
 		 	enemyHits++;
 		 	updateMultiplier();
+
+		 	pointsAdd = 200;
+
 		 	// var e = new Enemy();
 		 	// enemy.add(e);
 
@@ -335,6 +348,8 @@ class PlayState extends FlxState
 			multishotCharge++;
 			updateMultishotText(); // Update the display
 		}
+
+		score += pointsAdd * MULTIPLIER;
 
 		// Update score
 		updateScoreText();
@@ -359,10 +374,10 @@ class PlayState extends FlxState
 			FlxG.camera.flash(0xFFFFFFFF, 1.0); // Flash white
 			boss.kill();
 
-			score += 5000; // Boss worth 5000 (?)
+			score += 5000 * MULTIPLIER; // Boss worth 5000 (?)
 			multishotCharge = MULTISHOT_CHARGE_MAX; // Boss fully recharges multishot charge
-			updateMultishotText();
 
+			updateMultishotText();
 			updateScoreText();
 
 			if (currentWave == FINAL_WAVE)
@@ -382,7 +397,7 @@ class PlayState extends FlxState
 		if (isgameOver)
 			return;
 
-		currentWave++;
+		isSpawning = true;
 
 		// Flash wave text on screen
 		waveText.visible = true;
@@ -391,6 +406,12 @@ class PlayState extends FlxState
 		var enemiesToSpawn:Int = 0;
 		var asteroidsToSpawn:Int = 0;
 
+		if (currentWave == 0)
+	    {
+	        enemiesToSpawn = 0;
+	        asteroidsToSpawn = 10;
+	        waveText.text = "Shoot the Asteroids!";
+	    }
 	    if (currentWave == 1)
 	    {
 	        enemiesToSpawn = 2;
@@ -417,52 +438,52 @@ class PlayState extends FlxState
 	    }
 	    else if (currentWave == 5) // Boss phase 1
 	    {
-	    	enemiesToSpawn = 0;
-	        asteroidsToSpawn = 0;
-	        waveText.text = "Enemy Leader Inbound";
-	        spawnBoss(0, 0);
+	    	enemiesToSpawn = 16;
+	        asteroidsToSpawn = 64;
+	        waveText.text = "Asteroid shower!";
 	    }
 	    else if (currentWave == 6)
 	    {
-	        enemiesToSpawn = 2;
-	        asteroidsToSpawn = 100;
-	        waveText.text = "Asteroid shower!";
+	        enemiesToSpawn = 0;
+	        asteroidsToSpawn = 32;
+	        waveText.text = "Enemy Leader Inbound...";
+	        spawnBoss(0, 0);
 	    }
 	    else if (currentWave == 7)
 	    {
-	        enemiesToSpawn = 12;
+	        enemiesToSpawn = 16;
 	        asteroidsToSpawn = 32;
 	        waveText.text = "Wave " + currentWave;
 	    }
 	    else if (currentWave == 8)
 	    {
-	        enemiesToSpawn = 14;
+	        enemiesToSpawn = 24;
 	        asteroidsToSpawn = 24;
 	        waveText.text = "Wave " + currentWave;
 	    }
 	    else if (currentWave == 9)
 	    {
-	        enemiesToSpawn = 16;
+	        enemiesToSpawn = 32;
 	        asteroidsToSpawn = 12;
 	        waveText.text = "Wave " + currentWave;
 	    }
 	    else if (currentWave == 10)
 	    {
-	        enemiesToSpawn = 32;
-	        asteroidsToSpawn = 6;
+	        enemiesToSpawn = 48;
+	        asteroidsToSpawn = 12;
 	        waveText.text = "Wave " + currentWave;
 	    }
 	    else if (currentWave == 11)
 	    {
-	        enemiesToSpawn = 32;
+	        enemiesToSpawn = 70;
 	        asteroidsToSpawn = 0;
 	        waveText.text = "Enemy Territory!";
 	    }
 	    else if (currentWave == FINAL_WAVE) // Boss Wave
 	    {
 	        enemiesToSpawn = 0;
-	        asteroidsToSpawn = 0;
-	        waveText.text = "Enemy Leader Awakened";
+	        asteroidsToSpawn = 32;
+	        waveText.text = "Enemy Leader Awakened...";
 	        spawnBoss(0, 1);
 	    }
 	    else // when game ends
@@ -475,19 +496,44 @@ class PlayState extends FlxState
 	    }
 
 		// Spawn enemies and asteroids
-		for (i in 0...enemiesToSpawn) 
-		{
-			enemy.add(new Enemy());
-		}
-
-		// Add asteroids staggered
-		if (asteroidsToSpawn > 0) // for somereason FlxTimer loops inf times if the value is 0
+		if (enemiesToSpawn > 0) // for some reason FlxTimer loops inf times if the value is 0
 		{
 			new FlxTimer().start(0.5, function(timer:FlxTimer)
 			{
-			    asteroid.add(new Asteroid());
+			    if (!PauseState.isPaused)
+			    	enemy.add(new Enemy());
+			}, enemiesToSpawn);
+		}
+
+		// Add asteroids staggered
+		if (asteroidsToSpawn > 0) // for some reason FlxTimer loops inf times if the value is 0
+		{
+			new FlxTimer().start(0.5, function(timer:FlxTimer)
+			{
+				if (!PauseState.isPaused)
+			    	asteroid.add(new Asteroid());
 			}, asteroidsToSpawn);
 		}
+
+		// Calculating the total spawn time to spawn in everything
+		var enemySpawnDuration = 0.5 * enemiesToSpawn;
+		var asteroidSpawnDuration = 0.5 * asteroidsToSpawn;
+		var totalSpawnTime = Math.max(enemySpawnDuration, asteroidSpawnDuration);
+
+		if (totalSpawnTime > 0)
+		{
+			new FlxTimer().start(totalSpawnTime + 0.1, function(timer:FlxTimer)
+			{
+				isSpawning = false;
+			});
+		}
+		else
+		{
+			// If nothing is spawning (like a boss wave), set the flag immediately.
+			isSpawning = false;
+		}
+
+		currentWave++;
 	}
 
 	function spawnBoss(assetID:Int = 0, bossType:Int = 0):Void
@@ -502,7 +548,7 @@ class PlayState extends FlxState
 
 	function isWaveComplete():Void
 	{
-		if (isgameOver)
+		if (isSpawning || isgameOver)
 			return;
 
 		if (ship.alive && enemy.countLiving() == 0 && asteroid.countLiving() <= 4 && (boss == null || !boss.alive))
@@ -522,11 +568,12 @@ class PlayState extends FlxState
 	// Function calculates score for player
 	function updateScoreText():Float
 	{
-		score = asteroidHits * 100 + enemyHits * 200; // Calculating the base score
-		score *= MULTIPLIER;
+		// score = asteroidHits * 100 + enemyHits * 200; // Calculating the base score
+		// score *= MULTIPLIER;
+
+		// Moved score calculation logic to collision function
 
 		scoreText.text = "Score: " + score;
-
 		return(score);
 	}
 
@@ -573,69 +620,10 @@ class PlayState extends FlxState
 		shotDelay = FlxG.random.float(-ENEMY_SHOT_DELAY, ENEMY_SHOT_DELAY) + 3;
 	}
 
-	
-
-
 
 	// function togglePause():Void
     // {
     //     isPaused = !isPaused;
     //     pauseGroup.visible = isPaused;
     // }
-
-
 }
-
-	class PauseState extends FlxSubState
-		{
-		public function new(){
-			super(0x33000000);
-		}
-
-		override function create()
-		{
-			super.create();
-
-	        function onContinue():Void
-		    {
-		    	close();
-		    }
-
-		    function onRestart():Void
-		    {
-		    	FlxG.resetState();
-		    }
-
-		    function onExit():Void
-		    {
-		    	FlxG.sound.playMusic(null, 1, true);
-		    	FlxG.switchState(MenuState.new); //Run time bug
-		    }			
-
-			// Dim background
-	        // var bg = new FlxSprite();
-	        // bg.makeGraphic(FlxG.width, FlxG.height, 0x88000000);
-	        // pauseGroup.add(bg);
-
-	        // “PAUSED” text
-	        var pauseText = new FlxText(0, 100, FlxG.width, "PAUSED");
-	        pauseText.setFormat(null, 32, 0xFFFFFFFF, "center");
-	        add(pauseText);
-
-	        // Continue button
-	        var btnContinue = new FlxButton(0, 200, "Continue", onContinue);
-	        btnContinue.screenCenter(X);
-	        add(btnContinue);
-
-	        // Restart button
-	        var btnRestart = new FlxButton(0, btnContinue.y + 25, "Restart", onRestart);
-	        btnRestart.screenCenter(X);
-	        add(btnRestart);
-
-	        // Exit button
-	        var btnExit = new FlxButton(0, btnRestart.y + 25, "Exit", onExit);
-	        btnExit.screenCenter(X);
-	        add(btnExit);
-
-		}
-	}

@@ -20,9 +20,19 @@ class Asteroid extends FlxSprite {
 
 		loadGraphic(asset, false);
 		
-		x = FlxG.random.float(0.0,1.0) * (FlxG.width - 32);
-		y = 0; //Always spawn at the top
+		// x = FlxG.random.float(0.0,1.0) * (FlxG.width - 32);
+		// y = 0; //Always spawn at the top
 
+		resetPosition();
+	}
+
+	function resetPosition():Void
+	{
+		x = FlxG.random.float(0, FlxG.width - width);
+		y = -height; // Start just above the screen
+
+		velocity.x = FlxG.random.float(-50, 50); // Slight horizontal drift
+		velocity.y = ASTEROID_SPEED;
 	}
 
 	override public function update(elapsed:Float):Void {
@@ -31,9 +41,9 @@ class Asteroid extends FlxSprite {
 		velocity.y = ASTEROID_SPEED;
 		velocity.x = FlxG.random.float(-50.0,50.0);
 
-		if (!isOnScreen()) {
-			y = 0;
-			x = FlxG.random.float(0.0,1.0) * (FlxG.width - 32);
+		if (y > FlxG.height) 
+		{
+			resetPosition();
 		}
 	}
 }

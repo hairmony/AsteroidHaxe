@@ -42,7 +42,7 @@ class MenuState extends FlxState
 	{
 		super.create();
 
-		FlxG.sound.playMusic("assets/music/Menumusic.ogg", 1, true);
+		FlxG.sound.playMusic("assets/music/MenuMusic.ogg", 1, true);
 
 		bg = new FlxSprite();
         bg.loadGraphic("assets/images/MenuBackground.png", false, 0, 0, false);
@@ -62,15 +62,25 @@ class MenuState extends FlxState
 
 		var playButton:FlxButton;
 		playButton = new FlxButton(0, 0, "Play", clickPlay);
+		// playButton.screenCenter();
+
+		playButton.x = 25;
+		playButton.y = FlxG.height / 2; // Position it vertically in the middle
 		add(playButton);
-		playButton.screenCenter();
 
 		var optionsButton:FlxButton;
 		optionsButton = new FlxButton(playButton.x , playButton.y + 25, "Options", optionsMenu);
+
+		// Align it with the playButton, underneath
+		optionsButton.x = playButton.x;
+		optionsButton.y = playButton.y + playButton.height + 10; // Add 10px padding
 		add(optionsButton);
 
 		var closeButton:FlxButton;
 		closeButton = new FlxButton(optionsButton.x , optionsButton.y + 25, "Exit", closeGame);
+
+		closeButton.x = optionsButton.x;
+		closeButton.y = optionsButton.y + optionsButton.height + 10; // Add 10px padding
 		add(closeButton);
 
 	}
@@ -104,6 +114,7 @@ class OptionsState extends FlxSubState
 	public var shipPreviewBG:FlxSprite;		
 	public var shipButton:FlxButton;
 	public var currentShipNumber:Int = 0;
+
 	public static var SHIP_MAX = 3;
 
 	public function new()
@@ -113,36 +124,58 @@ class OptionsState extends FlxSubState
 		bg = new FlxSprite();
         bg.loadGraphic("assets/images/MenuBackground.png", false, 0, 0, false);
         add(bg);
+
+        scaleBackgroundToCover(bg, FlxG.width, FlxG.height);
+    }
+
+    // Could be optimized, I just have it copied over from the other class
+    function scaleBackgroundToCover(sprite:FlxSprite, targetWidth:Int, targetHeight:Int):Void
+    {
+        var originalWidth = sprite.graphic.bitmap.width;
+        var originalHeight = sprite.graphic.bitmap.height;
+
+        var scaleX:Float = targetWidth / originalWidth;
+        var scaleY:Float = targetHeight / originalHeight;
+
+        // Use the larger scale to ensure full coverage (might crop image)
+        var scale:Float = Math.max(scaleX, scaleY);
+
+        sprite.scale.set(scale, scale);
+        sprite.updateHitbox();
     }
 	
 	override function create()
 	{
 		super.create();
 
-		shipButton = new FlxButton(0, 0 , "", cycleShipChoice);
+		final padding:Float = 10;
+		final startX:Float = 25;
+		final startY:Float = FlxG.height / 2;
+
+		shipButton = new FlxButton(startX, startY, "", cycleShipChoice);
 		add(shipButton);
-		shipButton.screenCenter();
 		updateShipButtonText(); // Set the initial text
 
 		var backButton:FlxButton;
-		backButton = new FlxButton(0, shipButton.y + 25 , "Back", backToMenu);
-		backButton.screenCenter(X);
+		backButton = new FlxButton(0, 0 , "Back", backToMenu);
+		backButton.x = shipButton.x;
+		backButton.y = shipButton.y + shipButton.height + padding;
 		add(backButton);
 
 		shipPreviewBG = new FlxSprite();
-		shipPreviewBG.makeGraphic(70,70, FlxColor.WHITE);
-		shipPreviewBG.screenCenter(X);
-		shipPreviewBG.y=shipButton.y - 95;
+		shipPreviewBG.makeGraphic(70, 70, FlxColor.WHITE);
+		shipPreviewBG.x = shipButton.x + (shipButton.width / 2) - (shipPreviewBG.width / 2);
+		shipPreviewBG.y = shipButton.y - shipPreviewBG.height - padding; // Positioned above
 		add(shipPreviewBG);
 
 		shipPreview = new FlxSprite();
-		shipPreview.loadGraphic(previewShip(),false, 0 ,0 );
-		shipPreview.scale.set(2,2);
-		shipPreview.screenCenter(X);
-		shipPreview.y=shipButton.y - 75;
+		shipPreview.loadGraphic(previewShip(), false, 0, 0);
+		shipPreview.scale.set(2, 2);
+		shipPreview.updateHitbox(); // Update dimensions after scaling
+		// **These lines keep the ship centered inside its background**
+		shipPreview.x = shipPreviewBG.x + (shipPreviewBG.width / 2) - (shipPreview.width / 2);
+		shipPreview.y = shipPreviewBG.y + (shipPreviewBG.height / 2) - (shipPreview.height / 2);
 		add(shipPreview);
-
-
 	}
 
 		function previewShip():String
@@ -194,15 +227,26 @@ class OptionsState extends FlxSubState
 		{
 			var save = new FlxSave();
 			save.bind("LeftAliened");
+
+			var shipName:String = "Missingno";
+
+			switch (save.data.shipChoice) 
+			{
+				case 0: shipName = "Guardian";
+				case 1: shipName = "Odyssey";
+				case 2: shipName = "Beyonder";
+				default: "Missingno";
+			}
+
 			if (save.data.shipChoice != null)
 			{
 				currentShipNumber = save.data.shipChoice;
-				shipButton.text = "Ship: " + (currentShipNumber + 1);
+				shipButton.text = (currentShipNumber + 1) + ": " + shipName;
 				save.close();
 			}
 			else
 			{
-			shipButton.text = "Ship: " + (currentShipNumber + 1);
+			shipButton.text = (currentShipNumber + 1) + ": " + shipName;
 			shipButton.screenCenter(X); // Recenter the button after text changes
 			}
 		}
