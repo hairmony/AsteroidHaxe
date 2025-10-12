@@ -14,12 +14,12 @@ class Boss extends FlxSprite
 	static var BOSS_HP_MAX = 75;
 	public var hp:Int = BOSS_HP_MAX; // Amount of hits to kill it
 
-	public var BOSS_CIRCLE_ATTACK_DELAY:Float = 1.5; // Boss attacks every x seconds
-	public static var BOSS_CIRCLE_SHOT_AMOUNT:Int = 14;
+	public var BOSS_CIRCLE_ATTACK_DELAY:Float = 0.5; // Boss attacks every x seconds
+	public static var BOSS_CIRCLE_SHOT_AMOUNT:Int = 12;
 
-	public var BOSS_WALL_ATTACK_DELAY:Float = 2.0; // Gap between lines formed
-	public static var BOSS_WALL_SHOT_AMOUNT:Int = 16;
-	public static var BOSS_WALL_GAP_SIZE = 2;
+	public var BOSS_WALL_ATTACK_DELAY:Float = 0.75; // Gap between lines formed
+	public static var BOSS_WALL_SHOT_AMOUNT:Int = 28;
+	public static var BOSS_WALL_GAP_SIZE = 6;
 	public static var BOSS_WALL_GAP_STEP = 3;
 
 	var patternAngle:Float = 0;
