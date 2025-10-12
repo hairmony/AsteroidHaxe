@@ -4,17 +4,28 @@ import flixel.FlxState;
 import flixel.FlxSprite;
 import flixel.FlxG;
 import flixel.util.FlxSpriteUtil;
+import flixel.util.FlxTimer;
 import flixel.input.keyboard.FlxKey;
 
 class Player extends FlxSprite {
 	//var sprite:FlxSprite;
-	public static var PLAYER_SPEED = 150;
+	public static var PLAYER_SPEED = 175;
 
-	public function new(assetID: Int = 0){
+    public var isDodging:Bool = false;
+	public var dodgeDuration:Float = 0.175; // Seconds
+	public static var DODGE_SPEED:Float = 400;   // Speed DURIGN dodge
+	public var dodgeTimer:Float = 0;
+
+	public var isInvincible = false;
+
+	public var asset:String = "assets/images/Ship.png";
+
+	public function new(assetID: Int = 0)
+	{
 		super((FlxG.width/2),(FlxG.height/2));
 		//sprite = new FlxSprite();
 
-		var asset = switch(assetID) {
+		asset = switch(assetID) {
             case 0: "assets/images/Ship.png";
             case 1: "assets/images/Ship2.png";
             case 2: "assets/images/Ship3.png";
@@ -27,7 +38,7 @@ class Player extends FlxSprite {
 		x = (FlxG.width/2) - (width/2); 
 		y = (FlxG.height /2) - (height /2);
 
-		scale.set(1.1, 1.1); // Sprite scale. COMMENT OUT IF SPRITE IS OF CORRECT SIZE
+		// scale.set(1.1, 1.1); // Sprite scale. COMMENT OUT IF SPRITE IS OF CORRECT SIZE
 		updateHitbox();
 	}
 
@@ -63,6 +74,32 @@ class Player extends FlxSprite {
 			var angDeg:Float = angRad * (180 / Math.PI);
 
 			angle = angDeg + 90;
+		}
+
+		if (isDodging)
+		{
+		    dodgeTimer += FlxG.elapsed;
+
+		    // Dodge trail!
+		    var trail = new FlxSprite(x, y);
+		    trail.loadGraphic(asset);
+		    trail.alpha = 0.2;
+		    trail.angle = angle;
+		    FlxG.state.add(trail);
+		    // Kill trail
+		    new FlxTimer().start(0.2, function(t:FlxTimer){ trail.kill(); });
+
+		    // Move forward in the direction ship facing currently
+		    var angleRad = (angle - 90) * Math.PI / 180;
+		    x += Math.cos(angleRad) * DODGE_SPEED * FlxG.elapsed;
+		    y += Math.sin(angleRad) * DODGE_SPEED * FlxG.elapsed;
+
+		    // Dodge ending
+		    if (dodgeTimer >= dodgeDuration)
+		    {
+		        isDodging = false;
+		        isInvincible = false;
+		    }
 		}
 	}
 }

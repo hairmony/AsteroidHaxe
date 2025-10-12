@@ -27,6 +27,18 @@ class PlayState extends FlxState
 	var enemy:FlxGroup;
 	var timer:FlxTimer;
 
+<<<<<<< Updated upstream
+=======
+	var fireTimer:Float = 0;
+    public static var PLAYER_SHOTS_PER_SEC:Float = 6; // How many shots per second
+    var fireRate = 1/PLAYER_SHOTS_PER_SEC;
+
+	public static var PLAYER_HEALTH_MAX:Int = 3; //Tracks player health
+    var playerHealth:Int = PLAYER_HEALTH_MAX; 
+
+	var isgameOver:Bool = false;
+
+>>>>>>> Stashed changes
 	// Score tracking variables
 	public var asteroidHits:Float = 0;
 	public var enemyHits:Float = 0;
@@ -37,8 +49,16 @@ class PlayState extends FlxState
 	// Variables for the multi-shot cooldown
 	public var multishotCharge:Float = 0;
 	public static var MULTISHOT_CHARGE_MAX:Float = 20; // in number of objects killed
+<<<<<<< Updated upstream
 	public static var MULTISHOT_SHOT_AMOUNT:Int = 6;
 	public static var ASTEROID_AMOUNT:Int = 5;
+=======
+	public static var MULTISHOT_SHOT_AMOUNT:Int = 8;
+	public var blinkTimer:Float = 0;
+	
+	// Variables for asteroid
+	public static var ASTEROID_AMOUNT:Int = 8;
+>>>>>>> Stashed changes
 
 	// Variables for enemies
 	public static var ENEMY_AMOUNT:Int = 4;
@@ -62,10 +82,15 @@ class PlayState extends FlxState
 		multishotText = new FlxText(25,45,0, "Super: " + multishotCharge + "/" + MULTISHOT_CHARGE_MAX, 14);
 		add(multishotText);
 
+<<<<<<< Updated upstream
 		multiplierText = new FlxText(25, 65, 0, MULTIPLIER + "X", 16);
 		multiplierText.visible = false;
 		add(multiplierText);
 
+=======
+		healthText = new FlxText(25,85,0, "HP: " + playerHealth, 14);
+		add(healthText);
+>>>>>>> Stashed changes
 
 		gameOverText = new FlxText(0, FlxG.height / 2, FlxG.width, "Transmission Lost", 32);
         gameOverText.alignment = CENTER;
@@ -167,6 +192,77 @@ class PlayState extends FlxState
 		//Prevents the player from going offscreen
 		FlxSpriteUtil.cameraBound(ship);
 
+<<<<<<< Updated upstream
+=======
+		multiplierText.text = MULTIPLIER + "x"; // Always show
+		multiplierText.visible = true;
+
+		if (MULTIPLIER == MULTIPLIER_MAX)
+	    {
+	        multiplierText.color = FlxColor.ORANGE; // Set to orange when at max
+	        scoreText.color = FlxColor.ORANGE;
+	    }
+	    else
+	    {
+	        multiplierText.color = FlxColor.WHITE; // Set back to white otherwise
+	        scoreText.color = FlxColor.WHITE;
+	    }
+
+	    // multishotControlsText will blink when visible
+	    if (multishotControlsText.visible == true)
+	    {
+	        blinkTimer += elapsed; // increment every frame
+	        multishotControlsText.alpha = 0.3 + 0.7 * (Math.sin(blinkTimer * 6) * 0.5 + 0.5);
+	    }
+	    else
+	    {
+	        multishotControlsText.alpha = 1;
+	        blinkTimer = 0;
+	    }
+
+		// Debug controls
+		if (FlxG.keys.justPressed.PERIOD) // press ] kill all enemies
+		{
+		for (e in enemy)
+		    {
+		        e.kill(); // Kill all enemies
+		    }
+		    for (a in asteroid)
+		    {
+		    	a.kill();
+		    }
+		    if (boss != null && boss.alive)
+		    {
+		        boss.kill(); // Kill all bosses
+		    }
+		    isWaveComplete();
+		}
+		if (FlxG.keys.justPressed.COMMA) // Press [ respawn
+		{
+			ship.reset(FlxG.width / 2 - (ship.width / 2), FlxG.height - 50);
+			playerHealth = PLAYER_HEALTH_MAX;
+			updateHealthText();
+			gameOverText.visible = false;
+		}
+		if (FlxG.keys.justPressed.SLASH) // Press [ respawn
+		{
+			ship.isInvincible = !ship.isInvincible;
+		}
+
+		// Handle multiplier countdown
+		if(MULTIPLIER > 1)
+		{
+		    // multiplierText.text = MULTIPLIER + "x";
+		    multiplierTimer += elapsed; // increment timer
+		    
+		    if (multiplierTimer >= MULTIPLIER_DECAY)
+		    {
+		    	MULTIPLIER--;
+		    	multiplierTimer = 0;
+		    }
+		}
+		
+>>>>>>> Stashed changes
 		// Reset button
 		if (FlxG.keys.justPressed.R)
 		{
@@ -189,8 +285,16 @@ class PlayState extends FlxState
 				// Default: shoot 1 projectile with LMB
 				if (FlxG.mouse.justPressed)
 				{
+<<<<<<< Updated upstream
 					var p = new Projectile(ship.getGraphicMidpoint().x, ship.getGraphicMidpoint().y, ship.angle - 90, false, 0);
 					projectiles.add(p); // Add projectile to group
+=======
+					// We use ship.angle here to base the shot direction on where the ship is facing
+					var p = new Projectile(ship.getGraphicMidpoint().x, ship.getGraphicMidpoint().y, ship.angle + angleIncrement, 0, 1);
+					specialProjectiles.add(p); // Add projectile to group
+					p.bulletPenetration = 3;
+					angleIncrement += (360/MULTISHOT_SHOT_AMOUNT);
+>>>>>>> Stashed changes
 				}
 
 				// Multishot: shoot 8 projectiles in a circle
@@ -212,7 +316,19 @@ class PlayState extends FlxState
 					multishotText.text = "Super: " + multishotCharge + "/" + MULTISHOT_CHARGE_MAX;
 				}
 			}
+<<<<<<< Updated upstream
         }
+=======
+
+			if (FlxG.keys.justReleased.SHIFT && !ship.isDodging)
+			{
+			    ship.isDodging = true;
+			    ship.dodgeTimer = 0;
+
+			    ship.isInvincible = true; // for collidePlayer function
+			}
+		}
+>>>>>>> Stashed changes
 
 	    // Player collision
 		FlxG.overlap(asteroid, ship, collidePlayer);
@@ -232,13 +348,68 @@ class PlayState extends FlxState
 
 	function collidePlayer(object1:FlxObject, object2:FlxObject):Void
 	{
+<<<<<<< Updated upstream
 		object2.kill();
 		gameOverText.visible = true;
+=======
+		if (ship.isDodging || ship.isInvincible)
+			return;
+
+		//always update player health
+		playerHealth--;
+
+		ship.color = 0xFFFF0000; // Red
+		new FlxTimer().start(0.1, function(t) { ship.color = 0xFFFFFFFF; }); // Flash if player hit
+
+		updateHealthText();
+		// healthText.text = "Hits Left: " + playerHealth;
+
+		if (playerHealth <= 0){
+			FlxG.camera.flash(0xFFFF0000, 2.0); // flash red
+			object2.kill();
+			gameWonText.visible = false; // If player dies after beating the boss
+			gameOverText.visible = true;
+		}
+		else { //When player hasn't run out of health
+			object1.kill(); //Get rid of collided object to not cause lasting bugs
+		}
+		
+>>>>>>> Stashed changes
 	}
 
 	// Function handles projectile collision
 	function collideProjectile(object1:FlxObject, object2:FlxObject):Void
 	{
+<<<<<<< Updated upstream
+=======
+		// object1.kill();
+		// object2.kill();
+
+		var pointsAdd:Int = 0;
+
+		if (Std.isOfType(object1, Projectile))
+	    {	
+	    	var p1 = cast(object1, Projectile);
+	        if (p1.bulletPenetration > 0)
+	            p1.bulletPenetration--;
+	        else
+	            p1.kill();
+	    }
+	    else 
+	    	object1.kill();
+
+	    if (Std.isOfType(object2, Projectile))
+	    {
+	        var p2 = cast(object2, Projectile);
+	        if (p2.bulletPenetration > 0)
+	            p2.bulletPenetration--;
+	        else
+	            p2.kill();
+	    }
+	    else
+	    	object2.kill();
+
+>>>>>>> Stashed changes
 		// Check if the object is an Asteroid
 		if (Std.isOfType(object1, Asteroid))
 		{
@@ -273,12 +444,224 @@ class PlayState extends FlxState
 
 		// Update score
 		updateScoreText();
+<<<<<<< Updated upstream
+=======
+		isWaveComplete();
+	}
+
+	function collideBoss(object1:FlxObject, object2:FlxObject):Void
+	{
+		var boss:Boss = cast(object1, Boss);
+		var projectile:Projectile = cast(object2, Projectile);
+
+		projectile.kill();
+
+		boss.hp--;
+
+		// This makes the boss flash when taking damage!
+		boss.color = 0xFFFF0000;
+		new FlxTimer().start(0.1, function(t) { boss.color = 0xFFFFFFFF; });
+
+		if (boss.hp <= 0)
+		{
+			FlxG.camera.flash(0xFFFFFFFF, 1.0); // Flash white
+			boss.kill();
+
+			score += 5000 * MULTIPLIER; // Boss worth 5000 (?)
+			multishotCharge = MULTISHOT_CHARGE_MAX; // Boss fully recharges multishot charge
+
+			updateMultishotText();
+			updateScoreText();
+
+			playerHealth += PLAYER_HEALTH_MAX;
+			healthText.text = "HP: " + playerHealth;
+
+			if (currentWave == FINAL_WAVE)
+			{
+				gameWonText.visible = true;
+	   			isgameOver = true;
+			}
+			else 
+			{
+				isWaveComplete();
+			}
+		}
+	}
+
+	function startWave():Void
+	{
+		if (isgameOver)
+			return;
+
+		currentWave++;
+		isSpawning = true;
+
+		// Flash wave text on screen
+		waveText.visible = true;
+		new FlxTimer().start(2.0, function(timer:FlxTimer){waveText.visible = false;});
+
+		enemiesToSpawn = 0;
+		asteroidsToSpawn = 0;
+
+		if (currentWave == 0)
+	    {
+	        enemiesToSpawn = 0;
+	        asteroidsToSpawn = 10;
+	        waveText.text = "Shoot the Asteroids!";
+	    }
+	    if (currentWave == 1)
+	    {
+	        enemiesToSpawn = 2;
+	        asteroidsToSpawn = 10;
+	        waveText.text = "Wave " + currentWave;
+	    }
+	    else if (currentWave == 2)
+	    {
+	        enemiesToSpawn = 4;
+	        asteroidsToSpawn = 12;
+	        waveText.text = "Wave " + currentWave;
+	    }
+	    else if (currentWave == 3)
+	    {
+	        enemiesToSpawn = 6;
+	        asteroidsToSpawn = 24;
+	        waveText.text = "Wave " + currentWave;
+	    }
+	    else if (currentWave == 4)
+	    {
+	        enemiesToSpawn = 10;
+	        asteroidsToSpawn = 32;
+	        waveText.text = "Wave " + currentWave;
+	    }
+	    else if (currentWave == 5) // Boss phase 1
+	    {
+	    	enemiesToSpawn = 16;
+	        asteroidsToSpawn = 64;
+	        waveText.text = "Asteroid shower!";
+	    }
+	    else if (currentWave == 6)
+	    {
+	        enemiesToSpawn = 0;
+	        asteroidsToSpawn = 0;
+	        waveText.text = "Enemy Leader Inbound...";
+	        spawnBoss(0, 0);
+	    }
+	    else if (currentWave == 7)
+	    {
+	        enemiesToSpawn = 16;
+	        asteroidsToSpawn = 32;
+	        waveText.text = "Wave " + currentWave;
+	    }
+	    else if (currentWave == 8)
+	    {
+	        enemiesToSpawn = 24;
+	        asteroidsToSpawn = 24;
+	        waveText.text = "Wave " + currentWave;
+	    }
+	    else if (currentWave == 9)
+	    {
+	        enemiesToSpawn = 32;
+	        asteroidsToSpawn = 12;
+	        waveText.text = "Wave " + currentWave;
+	    }
+	    else if (currentWave == 10)
+	    {
+	        enemiesToSpawn = 48;
+	        asteroidsToSpawn = 12;
+	        waveText.text = "Wave " + currentWave;
+	    }
+	    else if (currentWave == 11)
+	    {
+	        enemiesToSpawn = 70;
+	        asteroidsToSpawn = 0;
+	        waveText.text = "Enemy Territory!";
+	    }
+	    else if (currentWave == FINAL_WAVE) // Boss Wave
+	    {
+	        enemiesToSpawn = 0;
+	        asteroidsToSpawn = 32;
+	        waveText.text = "Enemy Leader Awakened...";
+	        spawnBoss(0, 1);
+	    }
+	    // else // when game ends
+	    // {
+	    //     if (boss == null || !boss.alive)
+	    //     {
+	    //         gameWonText.visible = true;
+	    //         isgameOver = true;
+	    //     }
+	    // }
+
+		// Spawn enemies and asteroids
+		if (enemiesToSpawn > 0) // for some reason FlxTimer loops inf times if the value is 0
+		{
+			new FlxTimer().start(0.5, function(timer:FlxTimer)
+			{
+			    if (!PauseState.isPaused)
+			    	enemy.add(new Enemy());
+			}, enemiesToSpawn);
+		}
+
+		// Add asteroids staggered
+		if (asteroidsToSpawn > 0) // for some reason FlxTimer loops inf times if the value is 0
+		{
+			new FlxTimer().start(0.5, function(timer:FlxTimer)
+			{
+				if (!PauseState.isPaused)
+			    	asteroid.add(new Asteroid());
+			}, asteroidsToSpawn);
+		}
+
+		// Calculating the total spawn time to spawn in everything
+		var enemySpawnDuration = 0.5 * enemiesToSpawn;
+		var asteroidSpawnDuration = 0.5 * asteroidsToSpawn;
+		var totalSpawnTime = Math.max(enemySpawnDuration, asteroidSpawnDuration);
+
+		if (totalSpawnTime > 0)
+		{
+			new FlxTimer().start(totalSpawnTime + 0.1, function(timer:FlxTimer)
+			{
+				isSpawning = false;
+			});
+		}
+		else
+		{
+			// If nothing is spawning (like a boss wave), set the flag immediately.
+			isSpawning = false;
+		}
+	}
+
+	function spawnBoss(assetID:Int = 0, bossType:Int = 0):Void
+	{
+		boss = new Boss(0, -100, assetID, bossType); // Slightly off the top of the screen
+		add(boss);
+
+		boss.x = (FlxG.width - boss.width) / 2;
+
+		flixel.tweens.FlxTween.tween(boss, { y: 50 }, 2.0); // Tweening exists!
+	}
+
+	function isWaveComplete():Void
+	{
+		if (isSpawning || isgameOver)
+			return;
+
+		var isEnemiesDead = (enemiesToSpawn == 0) || (enemy.countLiving() == 0);
+    	var isAsteroidsDead = (asteroidsToSpawn == 0) || (asteroid.countLiving() <= 4);
+
+		if (ship.alive && isEnemiesDead && isAsteroidsDead && (boss == null || !boss.alive))
+		{
+			startWave();
+		}
+>>>>>>> Stashed changes
 	}
 
 	function updateMultishotText():Void
 	{
 		if (multishotCharge >= MULTISHOT_CHARGE_MAX)
+		{
 			multishotControlsText.visible = true;
+		}
 		
 		multishotText.text = "Super: " + multishotCharge + "/" + MULTISHOT_CHARGE_MAX;
 	}
@@ -300,7 +683,24 @@ class PlayState extends FlxState
 		score *= MULTIPLIER;
 		scoreText.text = "Score: " + score;
 
+<<<<<<< Updated upstream
 		return(score);
+=======
+	function updateHealthText()
+	{
+		healthText.text = "HP: " + playerHealth;
+	}
+
+	function updateMultiplier()
+	{
+		// Increase multiplier, up to max
+	    if(MULTIPLIER < MULTIPLIER_MAX)
+	    {
+	        MULTIPLIER++;
+	    }
+	    
+	    multiplierTimer = 0;
+>>>>>>> Stashed changes
 	}
 
 	//I feel this can be optimized

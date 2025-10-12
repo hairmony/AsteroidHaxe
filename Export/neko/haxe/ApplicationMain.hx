@@ -35,7 +35,11 @@ class ApplicationMain
 		ManifestResources.init(config);
 		#end
 
+<<<<<<< Updated upstream
 		app.meta["build"] = "14";
+=======
+		app.meta["build"] = "30";
+>>>>>>> Stashed changes
 		app.meta["company"] = "Company Name";
 		app.meta["file"] = "AsteroidP1";
 		app.meta["name"] = "AsteroidP1";

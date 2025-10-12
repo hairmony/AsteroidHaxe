@@ -9,7 +9,13 @@ class Projectile extends FlxSprite
     public static var ENEMY_PROJECTILE_SPEED:Int = 95; //125
     public var speed = 1;
 
+<<<<<<< Updated upstream
     public function new(X:Float, Y:Float, Angle:Float, isEnemy:Bool, assetID: Int = 0)
+=======
+    public var bulletPenetration:Int = 0; // How many things it can survive hitting
+
+    public function new(X:Float, Y:Float, Angle:Float, isEnemy:Int = 0, assetID: Int = 0)
+>>>>>>> Stashed changes
     {
         super(X, Y);
 
