@@ -13,5 +13,9 @@
 	<haxelib name="flixel" />
 
 	<haxelib name="flixel-addons" />
+<<<<<<< HEAD
+=======
+
+>>>>>>> 1979617 (Added volume slider with great difficulty for no reason)
 	
 </project>

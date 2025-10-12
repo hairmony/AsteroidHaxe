@@ -93,7 +93,11 @@ class PlayState extends FlxState
 		MULTIPLIER = 1;
 		multiplierTimer = 0;
 
+<<<<<<< HEAD
 		FlxG.sound.playMusic("assets/music/LevelMusic.ogg", 0.5, true);
+=======
+		FlxG.sound.playMusic("assets/music/Levelmusic.ogg", 1, true);
+>>>>>>> 1979617 (Added volume slider with great difficulty for no reason)
 		super.create();
 
 		//Create text
