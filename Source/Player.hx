@@ -5,6 +5,7 @@ import flixel.FlxSprite;
 import flixel.FlxG;
 import flixel.util.FlxSpriteUtil;
 import flixel.input.keyboard.FlxKey;
+import flixel.util.FlxTimer;
 
 class Player extends FlxSprite {
 	//var sprite:FlxSprite;
