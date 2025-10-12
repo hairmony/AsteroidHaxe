@@ -26,7 +26,7 @@ class PlayState extends FlxState
 	var multishotControlsText:FlxText;
 	var gameOverText:FlxText;
 	var gameWonText:FlxText;
-	var multiplierText:FlxText;
+	public var multiplierText:FlxText;
 	var healthText:FlxText;
 	var enemy:FlxGroup;
 	var timer:FlxTimer;
@@ -34,6 +34,8 @@ class PlayState extends FlxState
 	var fireTimer:Float = 0;
     public static var PLAYER_SHOTS_PER_SEC:Float = 6; // How many shots per second
     var fireRate = 1/PLAYER_SHOTS_PER_SEC;
+
+    public static var PLAYER_HEALTH_MAX:Int = 3;
     var playerHealth:Int = 3; //Tracks player health
 
 	var isgameOver:Bool = false;
@@ -53,6 +55,7 @@ class PlayState extends FlxState
 	public var multishotCharge:Float = 0;
 	public static var MULTISHOT_CHARGE_MAX:Float = 20; // in number of objects killed
 	public static var MULTISHOT_SHOT_AMOUNT:Int = 8;
+	public var blinkTimer:Float = 0;
 	
 	// Variables for asteroid
 	public static var ASTEROID_AMOUNT:Int = 8;
@@ -104,7 +107,7 @@ class PlayState extends FlxState
 		multishotText = new FlxText(25,65,0, "Super: " + multishotCharge + "/" + MULTISHOT_CHARGE_MAX, 14);
 		add(multishotText);
 
-		healthText = new FlxText(25,85,0, "Hits Left: " + playerHealth, 14);
+		healthText = new FlxText(25,85,0, "HP: " + playerHealth, 14);
 		add(healthText);
 
 		gameOverText = new FlxText(0, FlxG.height / 2, FlxG.width, "Transmission Lost", 32);
@@ -203,15 +206,29 @@ class PlayState extends FlxState
 
 		if (MULTIPLIER == MULTIPLIER_MAX)
 	    {
-	        multiplierText.color = FlxColor.RED; // Set to red when at max
+	        multiplierText.color = FlxColor.ORANGE; // Set to orange when at max
+	        scoreText.color = FlxColor.ORANGE;
 	    }
 	    else
 	    {
 	        multiplierText.color = FlxColor.WHITE; // Set back to white otherwise
+	        scoreText.color = FlxColor.WHITE;
+	    }
+
+	    // multishotControlsText will blink when visible
+	    if (multishotControlsText.visible == true)
+	    {
+	        blinkTimer += elapsed; // increment every frame
+	        multishotControlsText.alpha = 0.3 + 0.7 * (Math.sin(blinkTimer * 6) * 0.5 + 0.5);
+	    }
+	    else
+	    {
+	        multishotControlsText.alpha = 1;
+	        blinkTimer = 0;
 	    }
 
 		// Debug controls
-		if (FlxG.keys.justPressed.RBRACKET) // press ] kill all enemies
+		if (FlxG.keys.justPressed.PERIOD) // press ] kill all enemies
 		{
 		for (e in enemy)
 		    {
@@ -227,10 +244,16 @@ class PlayState extends FlxState
 		    }
 		    isWaveComplete();
 		}
-		if (FlxG.keys.justPressed.LBRACKET) // Press [ respawn
+		if (FlxG.keys.justPressed.COMMA) // Press [ respawn
 		{
-			ship.reset(FlxG.width / 2, FlxG.height - 50);
+			ship.reset(FlxG.width / 2 - (ship.width / 2), FlxG.height - 50);
+			playerHealth = PLAYER_HEALTH_MAX;
+			updateHealthText();
 			gameOverText.visible = false;
+		}
+		if (FlxG.keys.justPressed.SLASH) // Press [ respawn
+		{
+			ship.isInvincible = !ship.isInvincible;
 		}
 
 		// Handle multiplier countdown
@@ -287,10 +310,19 @@ class PlayState extends FlxState
 					// We use ship.angle here to base the shot direction on where the ship is facing
 					var p = new Projectile(ship.getGraphicMidpoint().x, ship.getGraphicMidpoint().y, ship.angle + angleIncrement, 0, 1);
 					specialProjectiles.add(p); // Add projectile to group
+					p.bulletPenetration = 3;
 					angleIncrement += (360/MULTISHOT_SHOT_AMOUNT);
 				}
 
 				updateMultishotText();
+			}
+
+			if (FlxG.keys.justReleased.SHIFT && !ship.isDodging)
+			{
+			    ship.isDodging = true;
+			    ship.dodgeTimer = 0;
+
+			    ship.isInvincible = true; // for collidePlayer function
 			}
 		}
 
@@ -320,9 +352,15 @@ class PlayState extends FlxState
 
 	function collidePlayer(object1:FlxObject, object2:FlxObject):Void
 	{
+		if (ship.isDodging || ship.isInvincible)
+			return;
+
 		//always update player health
 		playerHealth--;
-		healthText.text = "Hits Left: " + playerHealth;
+		updateHealthText();
+
+		ship.color = 0xFFFF0000; // Red
+		new FlxTimer().start(0.1, function(t) { ship.color = 0xFFFFFFFF; }); // Flash if player hit
 
 		if (playerHealth < 1){
 			FlxG.camera.flash(0xFFFF0000, 2.0); // flash red
@@ -339,10 +377,32 @@ class PlayState extends FlxState
 	// Function handles projectile collision
 	function collideProjectile(object1:FlxObject, object2:FlxObject):Void
 	{
-		object1.kill();
-		object2.kill();
+		// object1.kill();
+		// object2.kill();
 
 		var pointsAdd:Int = 0;
+
+		if (Std.isOfType(object1, Projectile))
+	    {	
+	    	var p1 = cast(object1, Projectile);
+	        if (p1.bulletPenetration > 0)
+	            p1.bulletPenetration--;
+	        else
+	            p1.kill();
+	    }
+	    else 
+	    	object1.kill();
+
+	    if (Std.isOfType(object2, Projectile))
+	    {
+	        var p2 = cast(object2, Projectile);
+	        if (p2.bulletPenetration > 0)
+	            p2.bulletPenetration--;
+	        else
+	            p2.kill();
+	    }
+	    else
+	    	object2.kill();
 
 		// Check if the object is an Asteroid
 		if (Std.isOfType(object1, Asteroid))
@@ -607,6 +667,11 @@ class PlayState extends FlxState
 
 		scoreText.text = "Score: " + score;
 		return(score);
+	}
+
+	function updateHealthText()
+	{
+		healthText.text = "HP: " + playerHealth;
 	}
 
 	function updateMultiplier()

@@ -12,6 +12,8 @@ class Projectile extends FlxSprite
     public var speed = 1;
     public var isEnemy:Int = 0;
 
+    public var bulletPenetration:Int = 0; // How many things it can survive hitting
+
     public function new(X:Float, Y:Float, Angle:Float, isEnemy:Int = 0, assetID: Int = 0)
     {
         super(X, Y);
