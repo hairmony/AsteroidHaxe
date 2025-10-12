@@ -27,12 +27,14 @@ class PlayState extends FlxState
 	var gameOverText:FlxText;
 	var gameWonText:FlxText;
 	var multiplierText:FlxText;
+	var healthText:FlxText;
 	var enemy:FlxGroup;
 	var timer:FlxTimer;
 
 	var fireTimer:Float = 0;
     public static var PLAYER_SHOTS_PER_SEC:Float = 6; // How many shots per second
     var fireRate = 1/PLAYER_SHOTS_PER_SEC;
+    var playerHealth:Int = 3; //Tracks player health
 
 	var isgameOver:Bool = false;
 
@@ -101,6 +103,9 @@ class PlayState extends FlxState
 
 		multishotText = new FlxText(25,65,0, "Super: " + multishotCharge + "/" + MULTISHOT_CHARGE_MAX, 14);
 		add(multishotText);
+
+		healthText = new FlxText(25,85,0, "Hits Left: " + playerHealth, 14);
+		add(healthText);
 
 		gameOverText = new FlxText(0, FlxG.height / 2, FlxG.width, "Transmission Lost", 32);
         gameOverText.alignment = CENTER;
@@ -315,10 +320,20 @@ class PlayState extends FlxState
 
 	function collidePlayer(object1:FlxObject, object2:FlxObject):Void
 	{
-		FlxG.camera.flash(0xFFFF0000, 2.0); // flash red
-		object2.kill();
-		gameWonText.visible = false; // If player dies after beating the boss
-		gameOverText.visible = true;
+		//always update player health
+		playerHealth--;
+		healthText.text = "Hits Left: " + playerHealth;
+
+		if (playerHealth < 1){
+			FlxG.camera.flash(0xFFFF0000, 2.0); // flash red
+			object2.kill();
+			gameWonText.visible = false; // If player dies after beating the boss
+			gameOverText.visible = true;
+		}
+		else { //When player hasn't run out of health
+			object1.kill(); //Get rid of collided object to not cause lasting bugs
+		}
+		
 	}
 
 	// Function handles projectile collision
@@ -391,6 +406,9 @@ class PlayState extends FlxState
 
 			updateMultishotText();
 			updateScoreText();
+
+			playerHealth++;
+			healthText.text = "Hits Left: " + playerHealth;
 
 			if (currentWave == FINAL_WAVE)
 			{
