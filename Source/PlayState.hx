@@ -94,13 +94,13 @@ class PlayState extends FlxState
 		//Create text
 		scoreText = new FlxText(25,25,0, "Score: " + score, 14); //add 5th argument as true if we are adding custom fonts
 		add(scoreText);
-
-		multishotText = new FlxText(25,65,0, "Super: " + multishotCharge + "/" + MULTISHOT_CHARGE_MAX, 14);
-		add(multishotText);
-
+		
 		multiplierText = new FlxText(25, 45, 0, MULTIPLIER + "x", 14);
 		multiplierText.visible = true;
 		add(multiplierText);
+
+		multishotText = new FlxText(25,65,0, "Super: " + multishotCharge + "/" + MULTISHOT_CHARGE_MAX, 14);
+		add(multishotText);
 
 		gameOverText = new FlxText(0, FlxG.height / 2, FlxG.width, "Transmission Lost", 32);
         gameOverText.alignment = CENTER;
@@ -115,6 +115,13 @@ class PlayState extends FlxState
 		waveText = new FlxText(0, FlxG.height / 2 - 50, FlxG.width, "", 16);
 		waveText.alignment = CENTER;
 		add(waveText);
+
+		// New projectile group
+		projectiles = new FlxGroup(); 
+		add(projectiles);
+
+		specialProjectiles = new FlxGroup();
+		add(specialProjectiles);
 
         // Ship select from save file
         var save = new FlxSave();
@@ -131,7 +138,7 @@ class PlayState extends FlxState
 		add(ship);
 
 		// Moved player spawn to bottom of the screen
-		ship.x = FlxG.width / 2;
+		ship.x = FlxG.width / 2 - (ship.width / 2);
 		ship.y = FlxG.height - 50;
 
 		//Create enemy group
@@ -155,13 +162,6 @@ class PlayState extends FlxState
 		//Create a seperate projectiles group for enemy projectiles
 		enemyProjectiles = new FlxGroup();
 		add(enemyProjectiles);
-
-		// New projectile group
-		projectiles = new FlxGroup(); 
-		add(projectiles);
-
-		specialProjectiles = new FlxGroup();
-		add(specialProjectiles);
 
 		multishotControlsText = new FlxText(0, FlxG.height - 32, 0, "SPACE to Super", 12);
 		multishotControlsText.alignment = CENTER;

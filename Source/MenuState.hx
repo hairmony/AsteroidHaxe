@@ -10,8 +10,6 @@ import flixel.util.FlxSave;
 import lime.system.System;
 import flixel.util.FlxColor;
 
-
-
 class MenuState extends FlxState
 {
 	var bg:FlxSprite;
@@ -77,7 +75,7 @@ class MenuState extends FlxState
 		add(optionsButton);
 
 		var closeButton:FlxButton;
-		closeButton = new FlxButton(optionsButton.x , optionsButton.y + 25, "Exit", closeGame);
+		closeButton = new FlxButton(optionsButton.x , optionsButton.y + 25, "Close", closeGame);
 
 		closeButton.x = optionsButton.x;
 		closeButton.y = optionsButton.y + optionsButton.height + 10; // Add 10px padding
@@ -115,7 +113,7 @@ class OptionsState extends FlxSubState
 	public var shipButton:FlxButton;
 	public var currentShipNumber:Int = 0;
 
-	public static var SHIP_MAX = 3;
+	public static var SHIP_MAX = 6;
 
 	public function new()
 	{
@@ -163,7 +161,7 @@ class OptionsState extends FlxSubState
 		add(backButton);
 
 		shipPreviewBG = new FlxSprite();
-		shipPreviewBG.makeGraphic(70, 70, FlxColor.WHITE);
+		shipPreviewBG.makeGraphic(70, 70, FlxColor.BLACK);
 		shipPreviewBG.x = shipButton.x + (shipButton.width / 2) - (shipPreviewBG.width / 2);
 		shipPreviewBG.y = shipButton.y - shipPreviewBG.height - padding; // Positioned above
 		add(shipPreviewBG);
@@ -189,6 +187,8 @@ class OptionsState extends FlxSubState
 	            case 1: asset = "assets/images/Ship2.png";
 	            case 2: asset = "assets/images/Ship3.png";
 	            case 3: asset = "assets/images/Ship4.png";
+	            case 4: asset = "assets/images/Ship5.png";
+	            case 5: asset = "assets/images/Ship6.png";
 	            default: asset = "assets/images/Ship.png";
 	        }
 	        return asset;
@@ -235,6 +235,9 @@ class OptionsState extends FlxSubState
 				case 0: shipName = "Guardian";
 				case 1: shipName = "Odyssey";
 				case 2: shipName = "Beyonder";
+				case 3: shipName = "Turncoat";
+				case 4: shipName = "Developer";
+				case 5: shipName = "Thankless";
 				default: "Missingno";
 			}
 
@@ -247,7 +250,7 @@ class OptionsState extends FlxSubState
 			else
 			{
 			shipButton.text = (currentShipNumber + 1) + ": " + shipName;
-			shipButton.screenCenter(X); // Recenter the button after text changes
+			// shipButton.screenCenter(X); // Recenter the button after text changes
 			}
 		}
 }

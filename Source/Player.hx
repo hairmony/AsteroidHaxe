@@ -19,6 +19,8 @@ class Player extends FlxSprite {
             case 1: "assets/images/Ship2.png";
             case 2: "assets/images/Ship3.png";
             case 3: "assets/images/Ship4.png";
+            case 4: "assets/images/Ship5.png";
+            case 5: "assets/images/Ship6.png";
             default: "assets/images/Ship.png";
         };
 
