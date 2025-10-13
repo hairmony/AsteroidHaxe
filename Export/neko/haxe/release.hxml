@@ -1,4 +1,9 @@
 -main ApplicationMain 
+--macro keep('IntIterator')
+-cp C:/HaxeToolkit/haxe/lib/hscript/2,6,0
+-D hscript=2.6.0
+-cp C:/HaxeToolkit/haxe/lib/flixel-addons/3,3,2
+-D flixel-addons=3.3.2
 -cp C:/HaxeToolkit/haxe/lib/flixel/6,1,0
 -D flixel=6.1.0
 --macro lime._internal.macros.DefineMacro.run()
@@ -7,15 +12,13 @@
 --macro openfl.utils._internal.ExtraParamsMacro.include()
 -cp C:/HaxeToolkit/haxe/lib/openfl/9,4,2/src
 -D openfl=9.4.2
---macro keep('IntIterator')
--cp C:/HaxeToolkit/haxe/lib/hscript/2,6,0
--D hscript=2.6.0
 -cp Source
 -D lime-harfbuzz
 -D lime-openal
 -D lime-threads
 -D tools=8.2.3
 -D lime-cairo
+-D NAPE_NO_INLINE
 -D lime-opengl
 -D no-compilation
 -D native

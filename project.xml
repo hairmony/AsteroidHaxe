@@ -11,5 +11,7 @@
 	<assets path="Assets" rename="assets" />
 
 	<haxelib name="flixel" />
+
+	<haxelib name="flixel-addons" />
 	
 </project>

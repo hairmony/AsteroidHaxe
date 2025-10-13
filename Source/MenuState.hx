@@ -15,6 +15,16 @@ class MenuState extends FlxState
 	var bg:FlxSprite;
 	var titleText:FlxText; // Variable for the title
 
+	// var rulesPanel:FlxSprite;
+	var rulesText:FlxText;
+
+	var creditsPanel:FlxSprite;
+	var creditsText:FlxText;
+	var creditsScrollSpeed:Float = 30; // pixels per second
+	var creditsActive:Bool = false;
+
+	public static var padding:Float = 10;
+
 	//Options menu
 	private function optionsMenu():Void
 	{
@@ -40,7 +50,7 @@ class MenuState extends FlxState
 	{
 		super.create();
 
-		FlxG.sound.playMusic("assets/music/MenuMusic.ogg", 1, true);
+		FlxG.sound.playMusic("assets/music/MenuMusic.ogg", 0.5, true);
 
 		bg = new FlxSprite();
         bg.loadGraphic("assets/images/MenuBackground.png", false, 0, 0, false);
@@ -67,20 +77,144 @@ class MenuState extends FlxState
 		add(playButton);
 
 		var optionsButton:FlxButton;
-		optionsButton = new FlxButton(playButton.x , playButton.y + 25, "Options", optionsMenu);
+		optionsButton = new FlxButton(playButton.x , playButton.y + playButton.height + padding, "Options", optionsMenu);
 
 		// Align it with the playButton, underneath
-		optionsButton.x = playButton.x;
-		optionsButton.y = playButton.y + playButton.height + 10; // Add 10px padding
 		add(optionsButton);
 
-		var closeButton:FlxButton;
-		closeButton = new FlxButton(optionsButton.x , optionsButton.y + 25, "Close", closeGame);
+		var rulesButton:FlxButton = new FlxButton(playButton.x, optionsButton.y + optionsButton.height + padding, "How To Play", showRules);
+		
+		rulesButton.x = playButton.x;
+		rulesButton.y = optionsButton.y + optionsButton.height + padding; // Add 10px padding
+		add(rulesButton);
 
-		closeButton.x = optionsButton.x;
-		closeButton.y = optionsButton.y + optionsButton.height + 10; // Add 10px padding
+		var creditsButton:FlxButton = new FlxButton(playButton.x, rulesButton.y + rulesButton.height + padding, "Credits", showCredits);
+		add(creditsButton);
+
+		var closeButton:FlxButton;
+		closeButton = new FlxButton(playButton.x , creditsButton.y + creditsButton.height + padding, "Close", closeGame);
+
+		closeButton.x = playButton.x;
+		closeButton.y = creditsButton.y + creditsButton.height + padding; // Add 10px padding
 		add(closeButton);
 
+		// Rules panel display rules
+		// rulesPanel = new FlxSprite(Std.int(FlxG.width * 0.55), Std.int(FlxG.height * 0.2));
+		// rulesPanel.makeGraphic(Std.int(FlxG.width * 0.4), Std.int(FlxG.height * 0.6), FlxColor.BLACK);
+		// rulesPanel.alpha = 0.5;
+		// rulesPanel.visible = false;
+		// add(rulesPanel);
+
+		// Credits panel
+		creditsPanel = new FlxSprite(FlxG.width - (FlxG.width * 0.4), 0); // Align to right edge
+		creditsPanel.makeGraphic(Std.int(FlxG.width * 0.4), FlxG.height, FlxColor.BLACK);
+		creditsPanel.alpha = 0.5;
+		creditsPanel.visible = false;
+		add(creditsPanel);
+		creditsText = new FlxText(creditsPanel.x + 10, creditsPanel.y + 10, creditsPanel.width - 20,
+		    "CREDITS:\n" +
+		    "\n" +
+		    "\n" +
+		    "\n" +
+		    "\n" +
+		    "\n" +
+		    "LEFT: ALIGNED\n" +
+		    "\n" +
+		    "by\n" +
+		    "Group 5\n" +
+		    "\n" +
+		    "\n" +
+		    "Lakehead University\n" +
+		    "COMP-4478-FA\n" +
+		    "Dr. Sabah Mohammed\n" +
+		    "\n" +
+		    "\n" +
+		    "\n" +
+		    "\n" +
+		    "\n" +
+		    "PROGRAMMERS" +
+		    "\n" +
+		    "CORE PROGRAMMERS\n" +
+		    "Kego Wigwas\n" +
+		    "Hari Vallath\n" +
+		    "Desire Ikechi\n" +
+		    "\n" +
+		    "ADDITIONAL PROGRAMMERS\n" +
+		    "Hari Vallath\n" +
+		    "Kego Wigwas\n" +
+		    "\n" +
+		    "UI PROGRAMMERS\n" +
+		    "Niraaj Gnanadevan\n" +
+		    "Nihar Poojari\n" +
+		    "\n" +
+		    "\n" +
+		    "\n" +
+		    "ART & SOUND DESIGN" +
+		    "\n" +
+		    "ART & SOUND DESIGNER\n" +
+		    "Niraaj Gnanadevan\n" +
+		    "\n" +
+		    "SPRITES\n" +
+		    "Leonardo Da Vinci\n" +
+		    "\n" +
+		    "\n" +
+		    "\n" +
+		    "MUSIC\n" +
+		    "\n" +
+		    "Mysteries\n" +
+		    "Infrared Scale\n" +
+		    "\n" +
+		    "The Final Battle\n" +
+		    "Infrared Scale\n" +
+		    "\n" +
+		    "MAZE\n" +
+		    "Density & Time\n" +
+		    "\n" +
+		    "MENU BACKGROUND\n" +
+		    "NASA/JPL Caltech\n" +
+		    "\n" +
+		    "\n" +
+		    "\n" +
+		    "PROJECT MANAGER\n" +
+		    "Hari Vallath\n" +
+		    "\n" +
+		    "DOCUMENTATION MANAGERS\n" +
+		    "Hari Vallath\n" +
+		    "Kego Wigwas\n" +
+		    "\n" +
+		    "\n" +
+		    "\n" +
+		    "QA ANALYSTS\n" +
+		    "Kego Wigwas\n" +
+		    "Hari Vallath\n" +
+		    "\n" +
+		    "\n" +
+		    "\n" +
+		    "\n" +
+		    "\n" +
+		    "Press 'Credits' to close panel."
+		);
+
+		creditsText.setFormat(null, 12, FlxColor.WHITE, "left");
+		creditsText.visible = false;
+		add(creditsText);
+
+		rulesText = new FlxText(creditsPanel.x + 10, FlxG.height / 2, creditsPanel.width - 20,
+		    "HOW TO PLAY:\n\n" +
+		    "1. WASD to move\n" +
+		    "2. LMB to shoot\n" +
+		    "3. SHIFT to dodge\n" +
+		    "3. SPACE to use SUPER\n" +
+		    "4. Survive the hoarde\n" +
+		    "5. Defeat ENEMY LEADER to gain HP\n" +
+		    "6. Survive...\n\n" +
+		    "Press 'How To Play' to close panel."
+		);
+
+		rulesText.y = FlxG.height / 2 - (rulesText.height / 2);
+		rulesText.setFormat(null, 12, FlxColor.WHITE, "left"); // LEFT ALIGNED!!!!
+		rulesText.visible = false;
+		add(rulesText);
 	}
 
 	function closeGame(){
@@ -102,6 +236,35 @@ class MenuState extends FlxState
 			bg.x = (FlxG.width - bg.width) / 2;
 			bg.y = (FlxG.height - bg.height) / 2;
 		}
+
+	    // Scroll credits if active
+	    if (creditsActive) {
+	        creditsText.y -= creditsScrollSpeed * elapsed;
+	        if (creditsText.y + creditsText.height < creditsPanel.y) {
+	            // Reset to bottom for continuous loop (optional)
+	            creditsText.y = creditsPanel.y + creditsPanel.height;
+	        }
+	    }
+	}
+
+	function showRules():Void
+	{
+	    creditsPanel.visible = !creditsPanel.visible;
+	    rulesText.visible = !rulesText.visible;
+	}
+
+	function showCredits():Void
+	{
+	    creditsPanel.visible = !creditsPanel.visible;
+	    creditsText.visible = !creditsText.visible;
+
+	    if (creditsText.visible) {
+	        // Start at bottom of panel
+	        creditsText.y = creditsPanel.y + creditsPanel.height;
+	        creditsActive = true;
+	    } else {
+	        creditsActive = false;
+	    }
 	}
 }
 
@@ -114,6 +277,7 @@ class OptionsState extends FlxSubState
 	public var currentShipNumber:Int = 0;
 
 	public static var SHIP_MAX = 6;
+	public var padding:Int = 10;
 
 	public function new()
 	{
@@ -146,9 +310,8 @@ class OptionsState extends FlxSubState
 	{
 		super.create();
 
-		final padding:Float = 10;
-		final startX:Float = 25;
-		final startY:Float = FlxG.height / 2;
+		var startX = 25;
+		var startY = FlxG.height / 2;
 
 		shipButton = new FlxButton(startX, startY, "", cycleShipChoice);
 		add(shipButton);

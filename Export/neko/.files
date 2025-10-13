@@ -12,7 +12,9 @@ Export/neko/bin/assets/images/Ship3.png
 Export/neko/bin/assets/images/Ship4.png
 Export/neko/bin/assets/images/Ship5.png
 Export/neko/bin/assets/images/Ship6.png
+Export/neko/bin/assets/music/BossMusic.ogg
 Export/neko/bin/assets/music/LevelMusic.ogg
+Export/neko/bin/assets/music/LevelMusic2.ogg
 Export/neko/bin/assets/music/MenuMusic.ogg
 Export/neko/bin/flixel/sounds/beep.ogg
 Export/neko/bin/flixel/sounds/flixel.ogg
@@ -20,4 +22,8 @@ Export/neko/bin/flixel/fonts/nokiafc22.ttf
 Export/neko/bin/flixel/fonts/monsterrat.ttf
 Export/neko/bin/flixel/images/ui/button.png
 Export/neko/bin/flixel/images/logo/default.png
+Export/neko/bin/flixel/images/transitions/circle.png
+Export/neko/bin/flixel/images/transitions/diagonal_gradient.png
+Export/neko/bin/flixel/images/transitions/diamond.png
+Export/neko/bin/flixel/images/transitions/square.png
 Export/neko/bin/manifest/default.json

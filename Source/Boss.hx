@@ -6,6 +6,8 @@ import flixel.util.FlxTimer;
 import flixel.FlxG;
 import flixel.math.FlxPoint;
 import flixel.math.FlxAngle;
+import flixel.tweens.FlxTween;
+import flixel.math.FlxMath;
 
 class Boss extends FlxSprite 
 {
@@ -21,6 +23,7 @@ class Boss extends FlxSprite
 	public static var BOSS_WALL_SHOT_AMOUNT:Int = 28;
 	public static var BOSS_WALL_GAP_SIZE = 6;
 	public static var BOSS_WALL_GAP_STEP = 3;
+	public static var BOSS_WALL_MOVEMENT_SPEED:Float = 150; // How fast the boss moves!
 
 	var patternAngle:Float = 0;
 	var attackTimer:FlxTimer; // Timer between attack patterns
@@ -29,6 +32,21 @@ class Boss extends FlxSprite
 	public function new(X:Float, Y:Float, assetID:Int = 0, bossType:Int = 0)
 	{
 		super(X, Y);
+
+		if (FlxG.sound.music != null)
+		{
+			FlxTween.tween(
+				FlxG.sound.music, 
+				{ volume: 0 }, 
+				1.0, 
+				{ onComplete: function(_) {
+					FlxG.sound.playMusic("assets/music/BossMusic.ogg", 0.5, true);
+				}}
+			);
+		}
+		else
+			FlxG.sound.playMusic("assets/music/BossMusic.ogg", 0.5, true);
+
 
 		var asset = switch(assetID){
 			case 0: "assets/images/Boss.png";
@@ -61,7 +79,7 @@ class Boss extends FlxSprite
 
 		if (hp <= BOSS_HP_MAX / 2)
 		{
-			spinAddtion = 6;
+			spinAddtion = -6.5;
 			shootDelayMultiplier = 0.8; // lower number is faster (its the percentage of DELAY)
 		}
 
@@ -111,6 +129,8 @@ class Boss extends FlxSprite
 
 	    lastGapPosition = gapPosition;
 
+	    velocity.x = gapDirection * BOSS_WALL_MOVEMENT_SPEED;
+
 	    for (i in 0...BOSS_WALL_SHOT_AMOUNT)
 	    {
 	        // Picked gap
@@ -134,6 +154,22 @@ class Boss extends FlxSprite
 		{
 			attackTimer.cancel();
 		}
+
+		if (FlxG.sound.music != null)
+		{
+			FlxTween.tween(
+				FlxG.sound.music, 
+				{ volume: 0 }, 
+				1.0, 
+				{ onComplete: function(_) {
+					FlxG.sound.playMusic("assets/music/LevelMusic.ogg", 0.5, true);
+				}}
+			);
+		}
+		else
+			FlxG.sound.playMusic("assets/music/LevelMusic.ogg", 0.5, true);
+
+
 		super.kill();
 	}
 
@@ -141,5 +177,17 @@ class Boss extends FlxSprite
 	override public function update(elapsed:Float):Void
 	{
 		super.update(elapsed);
+
+		if (velocity.x != 0)
+        {
+            var oldX = x;
+            x = FlxMath.bound(x, 0, FlxG.width - width);
+            
+            // If boss hits boundary STOP
+            if (x != oldX)
+            {
+                velocity.x = 0;
+            }
+        }
 	}
 }

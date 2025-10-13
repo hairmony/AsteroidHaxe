@@ -93,7 +93,7 @@ class PlayState extends FlxState
 		MULTIPLIER = 1;
 		multiplierTimer = 0;
 
-		FlxG.sound.playMusic("assets/music/LevelMusic.ogg", 1, true);
+		FlxG.sound.playMusic("assets/music/LevelMusic.ogg", 0.5, true);
 		super.create();
 
 		//Create text
@@ -228,7 +228,7 @@ class PlayState extends FlxState
 	    }
 
 		// Debug controls
-		if (FlxG.keys.justPressed.PERIOD) // press ] kill all enemies
+		if (FlxG.keys.justPressed.PERIOD) // press . kill all enemies
 		{
 		for (e in enemy)
 		    {
@@ -244,14 +244,14 @@ class PlayState extends FlxState
 		    }
 		    isWaveComplete();
 		}
-		if (FlxG.keys.justPressed.COMMA) // Press [ respawn
+		if (FlxG.keys.justPressed.COMMA) // Press , respawn
 		{
 			ship.reset(FlxG.width / 2 - (ship.width / 2), FlxG.height - 50);
 			playerHealth = PLAYER_HEALTH_MAX;
 			updateHealthText();
 			gameOverText.visible = false;
 		}
-		if (FlxG.keys.justPressed.SLASH) // Press [ respawn
+		if (FlxG.keys.justPressed.SLASH) // Press / for God mode
 		{
 			ship.isInvincible = !ship.isInvincible;
 		}
@@ -500,7 +500,7 @@ class PlayState extends FlxState
 		if (currentWave == 0)
 	    {
 	        enemiesToSpawn = 0;
-	        asteroidsToSpawn = 10;
+	        asteroidsToSpawn = 12;
 	        waveText.text = "Shoot the Asteroids!";
 	    }
 	    if (currentWave == 1)
@@ -518,64 +518,64 @@ class PlayState extends FlxState
 	    else if (currentWave == 3)
 	    {
 	        enemiesToSpawn = 6;
-	        asteroidsToSpawn = 24;
+	        asteroidsToSpawn = 12;
 	        waveText.text = "Wave " + currentWave;
 	    }
 	    else if (currentWave == 4)
 	    {
-	        enemiesToSpawn = 10;
-	        asteroidsToSpawn = 32;
+	        enemiesToSpawn = 12;
+	        asteroidsToSpawn = 12;
 	        waveText.text = "Wave " + currentWave;
 	    }
 	    else if (currentWave == 5) // Boss phase 1
 	    {
 	    	enemiesToSpawn = 16;
-	        asteroidsToSpawn = 64;
-	        waveText.text = "Asteroid shower!";
+	        asteroidsToSpawn = 16;
+	        waveText.text = "Wave " + currentWave;
 	    }
 	    else if (currentWave == 6)
 	    {
 	        enemiesToSpawn = 0;
-	        asteroidsToSpawn = 32;
+	        asteroidsToSpawn = 12;
 	        waveText.text = "Enemy Leader Inbound...";
-	        spawnBoss(0, 0);
+	        spawnBoss(0, 1);
 	    }
 	    else if (currentWave == 7)
 	    {
 	        enemiesToSpawn = 16;
-	        asteroidsToSpawn = 32;
-	        waveText.text = "Wave " + currentWave;
+	        asteroidsToSpawn = 24;
+	        waveText.text = "Wave " + (currentWave - 1); // Don't count BOSS as a wave
 	    }
 	    else if (currentWave == 8)
 	    {
 	        enemiesToSpawn = 24;
 	        asteroidsToSpawn = 24;
-	        waveText.text = "Wave " + currentWave;
+	        waveText.text = "Wave " + (currentWave - 1);
 	    }
 	    else if (currentWave == 9)
 	    {
 	        enemiesToSpawn = 32;
 	        asteroidsToSpawn = 12;
-	        waveText.text = "Wave " + currentWave;
+	        waveText.text = "Wave " + (currentWave - 1);
 	    }
 	    else if (currentWave == 10)
 	    {
 	        enemiesToSpawn = 48;
 	        asteroidsToSpawn = 12;
-	        waveText.text = "Wave " + currentWave;
+	        waveText.text = "Wave " + (currentWave - 1);
 	    }
 	    else if (currentWave == 11)
 	    {
-	        enemiesToSpawn = 70;
+	        enemiesToSpawn = 80;
 	        asteroidsToSpawn = 0;
 	        waveText.text = "Enemy Territory!";
 	    }
 	    else if (currentWave == FINAL_WAVE) // Boss Wave
 	    {
 	        enemiesToSpawn = 0;
-	        asteroidsToSpawn = 32;
+	        asteroidsToSpawn = 12;
 	        waveText.text = "Enemy Leader Awakened...";
-	        spawnBoss(0, 1);
+	        spawnBoss(0, 0);
 	    }
 	    // else // when game ends
 	    // {

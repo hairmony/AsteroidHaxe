@@ -11,8 +11,9 @@ class Player extends FlxSprite {
 	//var sprite:FlxSprite;
 	public static var PLAYER_SPEED = 150;
 
+	// Dodging variables
 	public var isDodging:Bool = false;
-	public var dodgeDuration:Float = 0.175; // Seconds
+	public var dodgeDuration:Float = 0.25; // Seconds
 	public static var DODGE_SPEED:Float = 400;   // Speed DURIGN dodge
 	public var dodgeTimer:Float = 0;
 
