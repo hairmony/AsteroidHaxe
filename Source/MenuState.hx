@@ -250,6 +250,7 @@ class MenuState extends FlxState
 	function showRules():Void
 	{
 	    rulesText.visible = !rulesText.visible;
+	    creditsPanel.visible = rulesText.visible;
 
 		    if (rulesText.visible)
 	    {
@@ -260,8 +261,8 @@ class MenuState extends FlxState
 
 	function showCredits():Void
 	{
-	    creditsPanel.visible = !creditsPanel.visible;
 	    creditsText.visible = !creditsText.visible;
+	    creditsPanel.visible = creditsText.visible;
 
 	    if (creditsText.visible)
 	    {
