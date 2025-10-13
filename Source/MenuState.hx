@@ -9,6 +9,7 @@ import flixel.text.FlxText;
 import flixel.util.FlxSave;
 import lime.system.System;
 import flixel.util.FlxColor;
+import flixel.addons.ui.FlxSlider;
 
 class MenuState extends FlxState
 {
@@ -50,7 +51,7 @@ class MenuState extends FlxState
 	{
 		super.create();
 
-		FlxG.sound.playMusic("assets/music/MenuMusic.ogg", 0.5, true);
+		FlxG.sound.playMusic("assets/music/Menumusic.ogg", 0.5, true);
 
 		bg = new FlxSprite();
         bg.loadGraphic("assets/images/MenuBackground.png", false, 0, 0, false);
@@ -274,6 +275,7 @@ class OptionsState extends FlxSubState
 	public var shipPreviewBG:FlxSprite;		
 	public var shipButton:FlxButton;
 	public var currentShipNumber:Int = 0;
+	public var volSlider:FlxSlider;
 
 	public static var SHIP_MAX = 6;
 	public var padding:Int = 10;
@@ -321,6 +323,15 @@ class OptionsState extends FlxSubState
 		backButton.x = shipButton.x;
 		backButton.y = shipButton.y + shipButton.height + padding;
 		add(backButton);
+
+		var volSlider = new FlxSlider(FlxG.sound,"volume", backButton.x, backButton.y + backButton.height + padding, 0, 1, 500, 32, 16, FlxColor.WHITE);
+		var sliderImg = "assets/images/Slider.png";
+		volSlider.handle.loadGraphic(sliderImg);
+		volSlider.handle.scale.set(0.02,0.02);
+		volSlider.handle.updateHitbox();
+		volSlider.handle.y = volSlider.body.y - (volSlider.handle.height/2) + (volSlider.body.height/2);
+		volSlider.setTexts("Volume level", false, "0", "100", 8);
+		add(volSlider);
 
 		shipPreviewBG = new FlxSprite();
 		shipPreviewBG.makeGraphic(70, 70, FlxColor.BLACK);

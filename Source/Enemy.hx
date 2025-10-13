@@ -8,6 +8,8 @@ import flixel.util.FlxSpriteUtil;
 class Enemy extends FlxSprite 
 {
 	public static var ENEMY_SPEED:Int = 55; //Default value
+	public var isDead:Bool = false;
+
 	
 	var initX:Float;//used to track the inital x coordinate of the enemy
 	var spawnSide:Int; // Tracks if it spawned on left = 0 or right = 1
@@ -17,12 +19,14 @@ class Enemy extends FlxSprite
 		super();
 
 		var asset = switch(assetID){
-			case 0: "assets/images/Enemy.png";
+			case 0: "assets/images/EnemyExplosion.png";
 			case 1: "assets/images/Enemy2.png";
 			default: "assets/images/Enemy.png";
 		}
 
-		loadGraphic(asset, false);
+		loadGraphic(asset, true, 32, 32);
+		animation.add("death", [1,2,3,4,5,6,7,8,9,10], 90);
+
 
 		spawnSide = FlxG.random.int(0,1);
 

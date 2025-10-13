@@ -5,20 +5,28 @@ import flixel.util.FlxSpriteUtil;
 
 class Asteroid extends FlxSprite {
 	public static var ASTEROID_SPEED:Int = 100; //Default value
+	public var isDead:Bool = false;
+
 	
 	public function new(assetID:Int = 0)
 	{
 		super();
 
 		var asset = switch(assetID) {
-            case 0: "assets/images/Asteroid.png";
+            case 0: "assets/images/Asteroid 01 - Explode.png";
             case 1: "assets/images/Asteroid2.png";
             case 2: "assets/images/Asteroid3.png";
             case 3: "assets/images/Asteroid4.png";
             default: "assets/images/Asteroid.png";
         };
 
-		loadGraphic(asset, false);
+		loadGraphic(asset, true, 96, 96);
+		centerOrigin();
+		width = 32;
+		height = 32;
+		offset.set(29,32);
+
+		animation.add("death", [1,2,3,4,5,6], 90, false);
 		
 		// x = FlxG.random.float(0.0,1.0) * (FlxG.width - 32);
 		// y = 0; //Always spawn at the top
