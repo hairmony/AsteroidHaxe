@@ -112,14 +112,10 @@ class MenuState extends FlxState
 		creditsPanel.visible = false;
 		add(creditsPanel);
 		creditsText = new FlxText(creditsPanel.x + 10, creditsPanel.y + 10, creditsPanel.width - 20,
-		    "CREDITS:\n" +
+		    "LEFT: ALIENED\n" +
 		    "\n" +
 		    "\n" +
-		    "\n" +
-		    "\n" +
-		    "\n" +
-		    "LEFT: ALIGNED\n" +
-		    "\n" +
+		    "Asteroid-Shooter\n" +
 		    "by\n" +
 		    "Group 5\n" +
 		    "\n" +
@@ -132,7 +128,7 @@ class MenuState extends FlxState
 		    "\n" +
 		    "\n" +
 		    "\n" +
-		    "PROGRAMMERS" +
+		    "PROGRAMMERS\n" +
 		    "\n" +
 		    "CORE PROGRAMMERS\n" +
 		    "Kego Wigwas\n" +
@@ -149,15 +145,18 @@ class MenuState extends FlxState
 		    "\n" +
 		    "\n" +
 		    "\n" +
-		    "ART & SOUND DESIGN" +
+		    "ART & SOUND DESIGN\n" +
 		    "\n" +
 		    "ART & SOUND DESIGNER\n" +
 		    "Niraaj Gnanadevan\n" +
 		    "\n" +
 		    "SPRITES\n" +
-		    "Leonardo Da Vinci\n" +
+		    "<TO BE ADDED>\n" +
+		    "Hari Vallath\n" +
+		    "Kego Wigwas\n" +
 		    "\n" +
-		    "\n" +
+		    "MENU BACKGROUND\n" +
+		    "NASA/JPL Caltech\n" +
 		    "\n" +
 		    "MUSIC\n" +
 		    "\n" +
@@ -169,9 +168,6 @@ class MenuState extends FlxState
 		    "\n" +
 		    "MAZE\n" +
 		    "Density & Time\n" +
-		    "\n" +
-		    "MENU BACKGROUND\n" +
-		    "NASA/JPL Caltech\n" +
 		    "\n" +
 		    "\n" +
 		    "\n" +
@@ -205,13 +201,16 @@ class MenuState extends FlxState
 		    "2. LMB to shoot\n" +
 		    "3. SHIFT to dodge\n" +
 		    "3. SPACE to use SUPER\n" +
-		    "4. Survive the hoarde\n" +
-		    "5. Defeat ENEMY LEADER to gain HP\n" +
-		    "6. Survive...\n\n" +
+		    "4. R to restart\n" +
+		    "5. ESC to pause\n" +
+		    "4. Hit asteroids/enemies to charge SUPER\n" +
+		    "6. Survive the asteroid shower\n" +
+		    "7. Survive the enemy drones\n" +
+		    "8. Defeat ENEMY LEADERs to gain HP\n\n" +
 		    "Press 'How To Play' to close panel."
 		);
 
-		rulesText.y = FlxG.height / 2 - (rulesText.height / 2);
+		rulesText.y = (FlxG.height / 2) - (rulesText.height / 2) - 50;
 		rulesText.setFormat(null, 12, FlxColor.WHITE, "left"); // LEFT ALIGNED!!!!
 		rulesText.visible = false;
 		add(rulesText);
