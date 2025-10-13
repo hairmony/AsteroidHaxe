@@ -93,11 +93,7 @@ class PlayState extends FlxState
 		MULTIPLIER = 1;
 		multiplierTimer = 0;
 
-<<<<<<< HEAD
-		FlxG.sound.playMusic("assets/music/LevelMusic.ogg", 0.5, true);
-=======
 		FlxG.sound.playMusic("assets/music/Levelmusic.ogg", 1, true);
->>>>>>> 1979617 (Added volume slider with great difficulty for no reason)
 		super.create();
 
 		//Create text
@@ -354,36 +350,102 @@ class PlayState extends FlxState
 	}
  
 
-	function collidePlayer(object1:FlxObject, object2:FlxObject):Void
+	function collidePlayer(object1:FlxSprite, object2:FlxSprite):Void
 	{
+
 		if (ship.isDodging || ship.isInvincible)
 			return;
 
-		//always update player health
-		playerHealth--;
-		updateHealthText();
+		switch (Type.getClass(object1))
+		{
+		case Asteroid:
+        var env:Asteroid = cast object1;
+        if (!env.isDead) {
+            // deduct player health once
+            playerHealth--;
+			ship.color = 0xFFFF0000; // Red
+			new FlxTimer().start(0.1, function(t) { ship.color = 0xFFFFFFFF; }); // Flash if player hit
 
-		ship.color = 0xFFFF0000; // Red
-		new FlxTimer().start(0.1, function(t) { ship.color = 0xFFFFFFFF; }); // Flash if player hit
+        }
+            healthText.text = "Hits Left: " + playerHealth;
 
-		if (playerHealth < 1){
-			FlxG.camera.flash(0xFFFF0000, 2.0); // flash red
-			object2.kill();
-			gameWonText.visible = false; // If player dies after beating the boss
-			gameOverText.visible = true;
-		}
-		else { //When player hasn't run out of health
-			object1.kill(); //Get rid of collided object to not cause lasting bugs
-		}
-		
-	}
+            // handle player death
+            if (playerHealth < 1) {
+                FlxG.camera.flash(0xFFFF0000, 2.0);
+                object2.kill();
+                gameWonText.visible = false;
+                gameOverText.visible = true;
+            }
+            else
+            {
+                // mark object as dead and play death animation
+                env.isDead = true;
+                env.animation.play("death");
+                new FlxTimer().start(0.05, function(timer:FlxTimer){ object1.kill(); });
+            }
+        
+	    case Enemy: 
+	        var e:Enemy = cast object1;
+	        if (!e.isDead) {
+	            playerHealth--;
+				ship.color = 0xFFFF0000; // Red
+				new FlxTimer().start(0.1, function(t) { ship.color = 0xFFFFFFFF; }); // Flash if player hit
+
+	        }
+	            healthText.text = "Hits Left: " + playerHealth;
+
+	            if (playerHealth < 1) {
+	                FlxG.camera.flash(0xFFFF0000, 2.0);
+	                object2.kill();
+	                gameWonText.visible = false;
+	                gameOverText.visible = true;
+	            } else {
+	                e.isDead = true;
+	                e.animation.play("death");
+	                new FlxTimer().start(0.05, function(timer:FlxTimer){ object1.kill(); });
+	            }
+	        
+	    case Projectile: 
+	    	playerHealth--;
+			ship.color = 0xFFFF0000; // Red
+			new FlxTimer().start(0.1, function(t) { ship.color = 0xFFFFFFFF; }); // Flash if player hit
+	    	healthText.text = "Hits Left: " + playerHealth;
+	    	if (playerHealth < 1) {
+	    		FlxG.camera.flash(0xFFFF0000, 2.0);
+	    		object2.kill();
+	    		gameWonText.visible = false;
+	    		gameOverText.visible = true;
+	            } else {
+	                object1.kill(); // projectiles just disappear, no animation
+	            }
+	        }
+	    }
+
 
 	// Function handles projectile collision
 	function collideProjectile(object1:FlxObject, object2:FlxObject):Void
 	{
-		// object1.kill();
-		// object2.kill();
+		switch (Type.getClass(object1))
+		{
+		case Asteroid:
+        var env:Asteroid = cast object1;
+        env.isDead = true;
+        env.animation.play("death");
+        new FlxTimer().start(0.05, function(timer:FlxTimer){ object1.kill(); });
+		object2.kill();        
 
+        case Enemy:
+        var env:Enemy = cast object1;
+        env.isDead = true;
+        env.animation.play("death");
+        new FlxTimer().start(0.05, function(timer:FlxTimer){ object1.kill(); });
+		object2.kill();
+
+        case Projectile:
+		object1.kill();
+		object2.kill();
+		}
+		
 		var pointsAdd:Int = 0;
 
 		if (Std.isOfType(object1, Projectile))
@@ -394,8 +456,8 @@ class PlayState extends FlxState
 	        else
 	            p1.kill();
 	    }
-	    else 
-	    	object1.kill();
+	    // else 
+	    // 	object1.kill();
 
 	    if (Std.isOfType(object2, Projectile))
 	    {
@@ -405,8 +467,8 @@ class PlayState extends FlxState
 	        else
 	            p2.kill();
 	    }
-	    else
-	    	object2.kill();
+	    // else
+	    // 	object2.kill();
 
 		// Check if the object is an Asteroid
 		if (Std.isOfType(object1, Asteroid))
@@ -720,6 +782,11 @@ class PlayState extends FlxState
 		//reroll shot delay
 		shotDelay = FlxG.random.float(-ENEMY_SHOT_DELAY, ENEMY_SHOT_DELAY) + 3;
 	}
+
+	// function deathAnimation(obj:FlxSprite)
+	// {
+
+	// }
 
 
 	// function togglePause():Void

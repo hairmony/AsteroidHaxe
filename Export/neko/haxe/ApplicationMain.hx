@@ -35,11 +35,7 @@ class ApplicationMain
 		ManifestResources.init(config);
 		#end
 
-<<<<<<< HEAD
-		app.meta["build"] = "34";
-=======
-		app.meta["build"] = "30";
->>>>>>> 1979617 (Added volume slider with great difficulty for no reason)
+		app.meta["build"] = "36";
 		app.meta["company"] = "Company Name";
 		app.meta["file"] = "AsteroidP1";
 		app.meta["name"] = "AsteroidP1";
