@@ -1,7 +1,4 @@
-Export/neko/bin/assets/images/Asteroid 01 - Base.png
-Export/neko/bin/assets/images/Asteroid 01 - Explode.png
 Export/neko/bin/assets/images/Asteroid.png
-Export/neko/bin/assets/images/Asteroid1.png
 Export/neko/bin/assets/images/Boss.png
 Export/neko/bin/assets/images/Enemy.png
 Export/neko/bin/assets/images/EnemyExplosion.png
@@ -18,9 +15,9 @@ Export/neko/bin/assets/images/Ship5.png
 Export/neko/bin/assets/images/Ship6.png
 Export/neko/bin/assets/images/Slider.png
 Export/neko/bin/assets/music/BossMusic.ogg
-Export/neko/bin/assets/music/Levelmusic.ogg
+Export/neko/bin/assets/music/LevelMusic.ogg
 Export/neko/bin/assets/music/LevelMusic2.ogg
-Export/neko/bin/assets/music/Menumusic.ogg
+Export/neko/bin/assets/music/MenuMusic.ogg
 Export/neko/bin/flixel/sounds/beep.ogg
 Export/neko/bin/flixel/sounds/flixel.ogg
 Export/neko/bin/flixel/fonts/nokiafc22.ttf

@@ -35,8 +35,10 @@ class PlayState extends FlxState
     public static var PLAYER_SHOTS_PER_SEC:Float = 6; // How many shots per second
     var fireRate = 1/PLAYER_SHOTS_PER_SEC;
 
-    public static var PLAYER_HEALTH_MAX:Int = 3;
+    public static var PLAYER_HEALTH_MAX:Int = 3; 
     var playerHealth:Int = 3; //Tracks player health
+
+    public static var DEATH_ANIMATION_DURATION:Float = 0.5; // To play animation, number of frames/Frame rate
 
 	var isgameOver:Bool = false;
 
@@ -93,7 +95,7 @@ class PlayState extends FlxState
 		MULTIPLIER = 1;
 		multiplierTimer = 0;
 
-		FlxG.sound.playMusic("assets/music/Levelmusic.ogg", 1, true);
+		FlxG.sound.playMusic("assets/music/LevelMusic.ogg", 1, true);
 		super.create();
 
 		//Create text
@@ -317,7 +319,7 @@ class PlayState extends FlxState
 				updateMultishotText();
 			}
 
-			if (FlxG.keys.justReleased.SHIFT && !ship.isDodging)
+			if (FlxG.mouse.justReleasedRight && !ship.isDodging)
 			{
 			    ship.isDodging = true;
 			    ship.dodgeTimer = 0;
@@ -366,30 +368,30 @@ class PlayState extends FlxState
 			ship.color = 0xFFFF0000; // Red
 			new FlxTimer().start(0.1, function(t) { ship.color = 0xFFFFFFFF; }); // Flash if player hit
 
-        }
+		}
             healthText.text = "Hits Left: " + playerHealth;
 
-            // handle player death
-            if (playerHealth < 1) {
-                FlxG.camera.flash(0xFFFF0000, 2.0);
-                object2.kill();
-                gameWonText.visible = false;
-                gameOverText.visible = true;
-            }
-            else
-            {
-                // mark object as dead and play death animation
-                env.isDead = true;
-                env.animation.play("death");
-                new FlxTimer().start(0.05, function(timer:FlxTimer){ object1.kill(); });
-            }
-        
+        // handle player death
+        if (playerHealth < 1) {
+            FlxG.camera.flash(0xFFFF0000, 2.0);
+            object2.kill();
+            gameWonText.visible = false;
+            gameOverText.visible = true;
+        }
+        else
+        {
+            // Death animation
+            env.isDead = true;
+            env.animation.play("death");
+            new FlxTimer().start(0.15, function(timer:FlxTimer){ object1.kill(); });
+        }
+    
 	    case Enemy: 
 	        var e:Enemy = cast object1;
 	        if (!e.isDead) {
 	            playerHealth--;
 				ship.color = 0xFFFF0000; // Red
-				new FlxTimer().start(0.1, function(t) { ship.color = 0xFFFFFFFF; }); // Flash if player hit
+				new FlxTimer().start(DEATH_ANIMATION_DURATION, function(t) { ship.color = 0xFFFFFFFF; }); // Flash if player hit
 
 	        }
 	            healthText.text = "Hits Left: " + playerHealth;
@@ -402,7 +404,7 @@ class PlayState extends FlxState
 	            } else {
 	                e.isDead = true;
 	                e.animation.play("death");
-	                new FlxTimer().start(0.05, function(timer:FlxTimer){ object1.kill(); });
+	                new FlxTimer().start(DEATH_ANIMATION_DURATION, function(timer:FlxTimer){ object1.kill(); });
 	            }
 	        
 	    case Projectile: 
@@ -431,14 +433,14 @@ class PlayState extends FlxState
         var env:Asteroid = cast object1;
         env.isDead = true;
         env.animation.play("death");
-        new FlxTimer().start(0.05, function(timer:FlxTimer){ object1.kill(); });
+        new FlxTimer().start(DEATH_ANIMATION_DURATION, function(timer:FlxTimer){ object1.kill(); });
 		object2.kill();        
 
         case Enemy:
         var env:Enemy = cast object1;
         env.isDead = true;
         env.animation.play("death");
-        new FlxTimer().start(0.05, function(timer:FlxTimer){ object1.kill(); });
+        new FlxTimer().start(DEATH_ANIMATION_DURATION, function(timer:FlxTimer){ object1.kill(); });
 		object2.kill();
 
         case Projectile:

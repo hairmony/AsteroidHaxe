@@ -25,7 +25,7 @@ class Enemy extends FlxSprite
 		}
 
 		loadGraphic(asset, true, 32, 32);
-		animation.add("death", [1,2,3,4,5,6,7,8,9,10], 90);
+		animation.add("death", [1,2,3,4,5,6,7,8,9,10], 8, false);
 
 
 		spawnSide = FlxG.random.int(0,1);

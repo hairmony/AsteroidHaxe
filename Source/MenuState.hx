@@ -51,7 +51,7 @@ class MenuState extends FlxState
 	{
 		super.create();
 
-		FlxG.sound.playMusic("assets/music/Menumusic.ogg", 0.5, true);
+		FlxG.sound.playMusic("assets/music/MenuMusic.ogg", 0.5, true);
 
 		bg = new FlxSprite();
         bg.loadGraphic("assets/images/MenuBackground.png", false, 0, 0, false);
@@ -249,14 +249,24 @@ class MenuState extends FlxState
 
 	function showRules():Void
 	{
-	    creditsPanel.visible = !creditsPanel.visible;
 	    rulesText.visible = !rulesText.visible;
+
+		    if (rulesText.visible)
+	    {
+	        creditsText.visible = false;
+	        creditsActive = false;
+	    }
 	}
 
 	function showCredits():Void
 	{
 	    creditsPanel.visible = !creditsPanel.visible;
 	    creditsText.visible = !creditsText.visible;
+
+	    if (creditsText.visible)
+	    {
+	        rulesText.visible = false;
+	    }
 
 	    if (creditsText.visible) {
 	        // Start at bottom of panel
@@ -318,20 +328,27 @@ class OptionsState extends FlxSubState
 		add(shipButton);
 		updateShipButtonText(); // Set the initial text
 
+		volSlider = new FlxSlider(FlxG.sound, "volume", shipButton.x, shipButton.y + (padding * 2), 0, 1, Std.int(shipButton.width) - 2, 10, 8, FlxColor.WHITE);
+		var sliderImg = "assets/images/Slider.png";
+		volSlider.handle.loadGraphic(sliderImg);
+		volSlider.handle.updateHitbox();
+
+		volSlider.handle.y = volSlider.body.y - (volSlider.handle.height/2) + (volSlider.body.height/2);
+
+		volSlider.setTexts("Volume", false, "0", "100", 6);
+		add(volSlider);
+
+		volSlider.x += -5;
+		volSlider.minLabel.visible = false;
+		volSlider.maxLabel.visible = false;
+		volSlider.nameLabel.y = volSlider.handle.y - 10;
+		volSlider.nameLabel.setFormat(null, 8, FlxColor.WHITE, "left");
+
 		var backButton:FlxButton;
 		backButton = new FlxButton(0, 0 , "Back", backToMenu);
 		backButton.x = shipButton.x;
-		backButton.y = shipButton.y + shipButton.height + padding;
+		backButton.y = FlxG.height / 2 + (4 * (shipButton.height + padding)); // Matches close button
 		add(backButton);
-
-		var volSlider = new FlxSlider(FlxG.sound,"volume", backButton.x, backButton.y + backButton.height + padding, 0, 1, 500, 32, 16, FlxColor.WHITE);
-		var sliderImg = "assets/images/Slider.png";
-		volSlider.handle.loadGraphic(sliderImg);
-		volSlider.handle.scale.set(0.02,0.02);
-		volSlider.handle.updateHitbox();
-		volSlider.handle.y = volSlider.body.y - (volSlider.handle.height/2) + (volSlider.body.height/2);
-		volSlider.setTexts("Volume level", false, "0", "100", 8);
-		add(volSlider);
 
 		shipPreviewBG = new FlxSprite();
 		shipPreviewBG.makeGraphic(70, 70, FlxColor.BLACK);
