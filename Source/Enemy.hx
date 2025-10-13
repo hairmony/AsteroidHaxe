@@ -19,14 +19,13 @@ class Enemy extends FlxSprite
 		super();
 
 		var asset = switch(assetID){
-			case 0: "assets/images/EnemyExplosion.png";
+			case 0: "assets/images/Enemy.png";
 			case 1: "assets/images/Enemy2.png";
 			default: "assets/images/Enemy.png";
 		}
 
 		loadGraphic(asset, true, 32, 32);
-		animation.add("death", [1,2,3,4,5,6,7,8,9,10], 8, false);
-
+		animation.add("death", [1,2,3,4,5,6,7,8,9,10], 24, false);
 
 		spawnSide = FlxG.random.int(0,1);
 

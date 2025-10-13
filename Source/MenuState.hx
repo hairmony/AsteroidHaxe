@@ -152,7 +152,7 @@ class MenuState extends FlxState
 		    "Niraaj Gnanadevan\n" +
 		    "\n" +
 		    "SPRITES\n" +
-		    "<TO BE ADDED>\n" +
+		    "LinkNinja via itch.io\n" +
 		    "Hari Vallath\n" +
 		    "Kego Wigwas\n" +
 		    "\n" +
@@ -169,6 +169,9 @@ class MenuState extends FlxState
 		    "\n" +
 		    "MAZE\n" +
 		    "Density & Time\n" +
+		    "\n" +
+		    "SOUND EFFECTS\n" +
+		    "Driken5482 via Pixabay\n" +
 		    "\n" +
 		    "\n" +
 		    "\n" +

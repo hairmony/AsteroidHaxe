@@ -13,6 +13,7 @@ import flixel.util.FlxSave;
 import flixel.util.FlxTimer;
 import flixel.math.FlxAngle;
 import flixel.util.FlxColor;
+import flixel.addons.display.FlxBackdrop;
 
 class PlayState extends FlxState
 {
@@ -38,7 +39,7 @@ class PlayState extends FlxState
     public static var PLAYER_HEALTH_MAX:Int = 3; 
     var playerHealth:Int = 3; //Tracks player health
 
-    public static var DEATH_ANIMATION_DURATION:Float = 0.5; // To play animation, number of frames/Frame rate
+    public static var DEATH_ANIMATION_DURATION:Float = 0.4; // To play animation, number of frames/Frame rate
 
 	var isgameOver:Bool = false;
 
@@ -78,6 +79,8 @@ class PlayState extends FlxState
 	var enemiesToSpawnForWave:Int = 0;
 	var asteroidsToSpawnForWave:Int = 0;
 
+	private var backdrop:FlxBackdrop;
+
 	public var FINAL_WAVE:Int = 12;
 	
 	// Pause menu variables
@@ -97,6 +100,10 @@ class PlayState extends FlxState
 
 		FlxG.sound.playMusic("assets/music/LevelMusic.ogg", 1, true);
 		super.create();
+
+		backdrop = new FlxBackdrop("assets/images/LevelBackground.png");
+        add(backdrop);
+        backdrop.velocity.set(0, 50); 
 
 		//Create text
 		scoreText = new FlxText(25,25,0, "Score: " + score, 14); //add 5th argument as true if we are adding custom fonts
@@ -429,23 +436,31 @@ class PlayState extends FlxState
 	{
 		switch (Type.getClass(object1))
 		{
-		case Asteroid:
-        var env:Asteroid = cast object1;
-        env.isDead = true;
-        env.animation.play("death");
-        new FlxTimer().start(DEATH_ANIMATION_DURATION, function(timer:FlxTimer){ object1.kill(); });
-		object2.kill();        
+			case Asteroid:
+			var env:Asteroid = cast object1;
+			if (!env.isDead)
+			{
+		        env.isDead = true;
+		        env.animation.play("death");
+		        FlxG.sound.play("assets/sounds/ExplodeAsteroid.ogg", 0.4, false);
+		        new FlxTimer().start(DEATH_ANIMATION_DURATION, function(timer:FlxTimer){ object1.kill(); });
+				object2.kill();      
+			}  
 
-        case Enemy:
-        var env:Enemy = cast object1;
-        env.isDead = true;
-        env.animation.play("death");
-        new FlxTimer().start(DEATH_ANIMATION_DURATION, function(timer:FlxTimer){ object1.kill(); });
-		object2.kill();
+	        case Enemy: 
+	        var env:Enemy = cast object1;
+        	if (!env.isDead) 
+        	{
+		        env.isDead = true;
+		        env.animation.play("death");
+		        FlxG.sound.play("assets/sounds/ExplodeEnemy.ogg", 0.4, false);
+		        new FlxTimer().start(DEATH_ANIMATION_DURATION, function(timer:FlxTimer){ object1.kill(); });
+				object2.kill();
+			}
 
-        case Projectile:
-		object1.kill();
-		object2.kill();
+	        case Projectile:
+			object1.kill();
+			object2.kill();
 		}
 		
 		var pointsAdd:Int = 0;
@@ -755,6 +770,9 @@ class PlayState extends FlxState
 
 	//I feel this can be optimized
 	function enemyShot(timer:FlxTimer): Void {
+		if (!PauseState.isPaused)
+			return;
+
 		//Access all the enemy FlxGroup elements
 		for(i in enemy){
 			var temp:Enemy = cast(i, Enemy); //create a temporary Enemy object based of the inspected FlxGroup element
