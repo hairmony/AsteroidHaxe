@@ -141,7 +141,7 @@ class MenuState extends FlxState
 		    "Kego Wigwas\n" +
 		    "\n" +
 		    "UI PROGRAMMERS\n" +
-		    "Niraaj Gnanadevan\n" +
+		    "Niraaj Harshadan\n" +
 		    "Nihar Poojari\n" +
 		    "\n" +
 		    "\n" +
@@ -149,15 +149,20 @@ class MenuState extends FlxState
 		    "ART & SOUND DESIGN\n" +
 		    "\n" +
 		    "ART & SOUND DESIGNER\n" +
-		    "Niraaj Gnanadevan\n" +
+		    "Niraaj Harshadan\n" +
 		    "\n" +
 		    "SPRITES\n" +
 		    "LinkNinja via itch.io\n" +
 		    "Hari Vallath\n" +
-		    "Kego Wigwas\n" +
 		    "\n" +
 		    "MENU BACKGROUND\n" +
 		    "NASA/JPL Caltech\n" +
+		    "\n" +
+		    "LEVEL BACKGROUND\n" +
+		    "Screaming Brain Studios via OpenGameArt.org\n" +
+		    "\n" +
+		    "CONCEPT ARTIST\n" +
+		    "Kego Wigwas\n" +
 		    "\n" +
 		    "MUSIC\n" +
 		    "\n" +

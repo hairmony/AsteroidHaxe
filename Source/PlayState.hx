@@ -104,6 +104,7 @@ class PlayState extends FlxState
 		backdrop = new FlxBackdrop("assets/images/LevelBackground.png");
         add(backdrop);
         backdrop.velocity.set(0, 50); 
+        // backdrop.scale.set(1.2,1.2); 
 
 		//Create text
 		scoreText = new FlxText(25,25,0, "Score: " + score, 14); //add 5th argument as true if we are adding custom fonts
@@ -376,7 +377,7 @@ class PlayState extends FlxState
 			new FlxTimer().start(0.1, function(t) { ship.color = 0xFFFFFFFF; }); // Flash if player hit
 
 		}
-            healthText.text = "Hits Left: " + playerHealth;
+            updateHealthText();
 
         // handle player death
         if (playerHealth < 1) {
@@ -390,7 +391,9 @@ class PlayState extends FlxState
             // Death animation
             env.isDead = true;
             env.animation.play("death");
-            new FlxTimer().start(0.15, function(timer:FlxTimer){ object1.kill(); });
+            object1.kill();
+	        object1.exists = true; 
+            new FlxTimer().start(0.15, function(timer:FlxTimer){ object1.exists = false; });
         }
     
 	    case Enemy: 
@@ -401,7 +404,7 @@ class PlayState extends FlxState
 				new FlxTimer().start(DEATH_ANIMATION_DURATION, function(t) { ship.color = 0xFFFFFFFF; }); // Flash if player hit
 
 	        }
-	            healthText.text = "Hits Left: " + playerHealth;
+	            updateHealthText();
 
 	            if (playerHealth < 1) {
 	                FlxG.camera.flash(0xFFFF0000, 2.0);
@@ -411,14 +414,16 @@ class PlayState extends FlxState
 	            } else {
 	                e.isDead = true;
 	                e.animation.play("death");
-	                new FlxTimer().start(DEATH_ANIMATION_DURATION, function(timer:FlxTimer){ object1.kill(); });
+	                object1.kill();
+		        	object1.exists = true; 
+	                new FlxTimer().start(DEATH_ANIMATION_DURATION, function(timer:FlxTimer){ object1.exists = false; });
 	            }
 	        
 	    case Projectile: 
 	    	playerHealth--;
 			ship.color = 0xFFFF0000; // Red
 			new FlxTimer().start(0.1, function(t) { ship.color = 0xFFFFFFFF; }); // Flash if player hit
-	    	healthText.text = "Hits Left: " + playerHealth;
+	    	updateHealthText();
 	    	if (playerHealth < 1) {
 	    		FlxG.camera.flash(0xFFFF0000, 2.0);
 	    		object2.kill();
@@ -443,7 +448,9 @@ class PlayState extends FlxState
 		        env.isDead = true;
 		        env.animation.play("death");
 		        FlxG.sound.play("assets/sounds/ExplodeAsteroid.ogg", 0.4, false);
-		        new FlxTimer().start(DEATH_ANIMATION_DURATION, function(timer:FlxTimer){ object1.kill(); });
+		        object1.kill();
+		        object1.exists = true; 
+		        new FlxTimer().start(DEATH_ANIMATION_DURATION, function(timer:FlxTimer){ object1.exists = false; });
 				object2.kill();      
 			}  
 
@@ -454,7 +461,9 @@ class PlayState extends FlxState
 		        env.isDead = true;
 		        env.animation.play("death");
 		        FlxG.sound.play("assets/sounds/ExplodeEnemy.ogg", 0.4, false);
-		        new FlxTimer().start(DEATH_ANIMATION_DURATION, function(timer:FlxTimer){ object1.kill(); });
+		        object1.kill();
+		        object1.exists = true; 
+		        new FlxTimer().start(DEATH_ANIMATION_DURATION, function(timer:FlxTimer){ object1.exists = false; });
 				object2.kill();
 			}
 
@@ -551,7 +560,7 @@ class PlayState extends FlxState
 			updateScoreText();
 
 			playerHealth++;
-			healthText.text = "Hits Left: " + playerHealth;
+			updateHealthText();
 
 			if (currentWave == FINAL_WAVE)
 			{
@@ -740,6 +749,11 @@ class PlayState extends FlxState
 		multishotText.text = "Super: " + multishotCharge + "/" + MULTISHOT_CHARGE_MAX;
 	}
 
+	function updateHealthText():Void
+	{
+		healthText.text = "HP: " + playerHealth;
+	}
+
 	// Function calculates score for player
 	function updateScoreText():Float
 	{
@@ -750,11 +764,6 @@ class PlayState extends FlxState
 
 		scoreText.text = "Score: " + score;
 		return(score);
-	}
-
-	function updateHealthText()
-	{
-		healthText.text = "HP: " + playerHealth;
 	}
 
 	function updateMultiplier()
@@ -770,7 +779,7 @@ class PlayState extends FlxState
 
 	//I feel this can be optimized
 	function enemyShot(timer:FlxTimer): Void {
-		if (!PauseState.isPaused)
+		if (PauseState.isPaused)
 			return;
 
 		//Access all the enemy FlxGroup elements

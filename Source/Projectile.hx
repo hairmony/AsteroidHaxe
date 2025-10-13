@@ -5,7 +5,7 @@ import flixel.FlxG;
 
 class Projectile extends FlxSprite
 {
-    public static var PLAYER_PROJECTILE_SPEED:Int = 255; // Projectile speed in pixel per sec
+    public static var PLAYER_PROJECTILE_SPEED:Int = 275; // Projectile speed in pixel per sec
     public static var ENEMY_PROJECTILE_SPEED:Int = 125; //95
     public static var BOSS_PROJECTILE_SPEED:Int = 100;
 
