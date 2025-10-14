@@ -332,7 +332,7 @@ class PlayState extends FlxState
 				updateMultishotText();
 			}
 
-			if (FlxG.mouse.justReleasedRight && !ship.isDodging)
+			if ((FlxG.keys.justReleased.SHIFT || FlxG.mouse.justReleasedRight) && !ship.isDodging)
 			{
 				FlxG.sound.play("assets/sounds/Dodge.ogg", 0.4, false);
 
