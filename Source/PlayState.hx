@@ -24,7 +24,7 @@ class PlayState extends FlxState
 	var specialProjectiles:FlxGroup; // Separate special projectiles
 	var scoreText:FlxText;
 	var multishotText:FlxText; // New text to track multishot
-	var multishotControlsText:FlxText;
+	var controlsText:FlxText;
 	var gameOverText:FlxText;
 	var gameWonText:FlxText;
 	public var multiplierText:FlxText;
@@ -181,11 +181,11 @@ class PlayState extends FlxState
 		enemyProjectiles = new FlxGroup();
 		add(enemyProjectiles);
 
-		multishotControlsText = new FlxText(0, FlxG.height - 32, 0, "SPACE to Super", 12);
-		multishotControlsText.alignment = CENTER;
-		multishotControlsText.screenCenter(X);
-		multishotControlsText.visible = false;
-		add(multishotControlsText);
+		controlsText = new FlxText(0, FlxG.height - 32, 0, "SPACE to Super", 12);
+		controlsText.alignment = CENTER;
+		controlsText.screenCenter(X);
+		controlsText.visible = false;
+		add(controlsText);
 
 		//create a timer that shoots an enemy projectile every 3 seconds
 		shotDelay = FlxG.random.float(-ENEMY_SHOT_DELAY, ENEMY_SHOT_DELAY) + 3;
@@ -225,15 +225,15 @@ class PlayState extends FlxState
 	        scoreText.color = FlxColor.WHITE;
 	    }
 
-	    // multishotControlsText will blink when visible
-	    if (multishotControlsText.visible == true)
+	    // controlsText will blink when visible
+	    if (controlsText.visible == true)
 	    {
 	        blinkTimer += elapsed; // increment every frame
-	        multishotControlsText.alpha = 0.3 + 0.7 * (Math.sin(blinkTimer * 6) * 0.5 + 0.5);
+	        controlsText.alpha = 0.3 + 0.7 * (Math.sin(blinkTimer * 6) * 0.5 + 0.5);
 	    }
 	    else
 	    {
-	        multishotControlsText.alpha = 1;
+	        controlsText.alpha = 1;
 	        blinkTimer = 0;
 	    }
 
@@ -301,6 +301,8 @@ class PlayState extends FlxState
 			// Default: shoot 1 projectile with LMB or hold LMB
 			if ((FlxG.mouse.pressed && fireTimer >= fireRate) || FlxG.mouse.justPressed)
 			{
+				FlxG.sound.play("assets/sounds/ShootPlayer.ogg", 0.4, false);
+
 				fireTimer = 0;
 
 				var p = new Projectile(ship.getGraphicMidpoint().x, ship.getGraphicMidpoint().y, ship.angle - 90, 0, 0);
@@ -310,9 +312,11 @@ class PlayState extends FlxState
 			// Multishot: shoot 8 projectiles in a circle
 			if (FlxG.keys.justPressed.SPACE && multishotCharge >= MULTISHOT_CHARGE_MAX)
 			{
+				FlxG.sound.play("assets/sounds/ShootSpecial.ogg", 0.4, false);
+
 				// Reset the cooldown
 				multishotCharge = 0;
-				multishotControlsText.visible = false;
+				controlsText.visible = false;
 
 				var angleIncrement:Float = 0;
 				for (i in 0...MULTISHOT_SHOT_AMOUNT)
@@ -327,8 +331,10 @@ class PlayState extends FlxState
 				updateMultishotText();
 			}
 
-			if (FlxG.mouse.justReleasedRight && !ship.isDodging)
+			if ((FlxG.keys.justReleased.SHIFT || FlxG.mouse.justReleasedRight) && !ship.isDodging)
 			{
+				FlxG.sound.play("assets/sounds/Dodge.ogg", 0.4, false);
+
 			    ship.isDodging = true;
 			    ship.dodgeTimer = 0;
 
@@ -369,55 +375,74 @@ class PlayState extends FlxState
 		switch (Type.getClass(object1))
 		{
 		case Asteroid:
-        var env:Asteroid = cast object1;
-        if (!env.isDead) {
-            // deduct player health once
-            playerHealth--;
-			ship.color = 0xFFFF0000; // Red
-			new FlxTimer().start(0.1, function(t) { ship.color = 0xFFFFFFFF; }); // Flash if player hit
+	        var env:Asteroid = cast object1;
+	        if (!env.isDead) {
+	            // deduct player health once
+	            playerHealth--;
+				ship.color = 0xFFFF0000; // Red
+				new FlxTimer().start(0.1, function(t) { ship.color = 0xFFFFFFFF; }); // Flash if player hit
 
-		}
-            updateHealthText();
+			}
+			else return;
 
-        // handle player death
-        if (playerHealth < 1) {
-            FlxG.camera.flash(0xFFFF0000, 2.0);
-            object2.kill();
-            gameWonText.visible = false;
-            gameOverText.visible = true;
-        }
-        else
-        {
-            // Death animation
-            env.isDead = true;
-            env.animation.play("death");
-            object1.kill();
-	        object1.exists = true; 
-            new FlxTimer().start(0.15, function(timer:FlxTimer){ object1.exists = false; });
-        }
+        	updateHealthText();
+
+	        // handle player death
+	        if (playerHealth < 1) {
+	            FlxG.camera.flash(0xFFFF0000, 2.0);
+	            object2.kill();
+
+	            controlsText.text = "R to Restart";
+				controlsText.visible = true;
+				controlsText.alignment = CENTER;
+				controlsText.screenCenter(X);
+
+	            gameWonText.visible = false;
+	            gameOverText.visible = true;
+	        }
+	        else
+	        {
+	            // Death animation
+	            env.isDead = true;
+	            env.animation.play("death");
+	            object1.kill();
+		        object1.exists = true; 
+	            new FlxTimer().start(0.15, function(timer:FlxTimer){ object1.exists = false; });
+	        }
     
 	    case Enemy: 
 	        var e:Enemy = cast object1;
-	        if (!e.isDead) {
+	        if (!e.isDead) 
+	        {
 	            playerHealth--;
 				ship.color = 0xFFFF0000; // Red
 				new FlxTimer().start(DEATH_ANIMATION_DURATION, function(t) { ship.color = 0xFFFFFFFF; }); // Flash if player hit
 
 	        }
+	        else return;
+
 	            updateHealthText();
 
-	            if (playerHealth < 1) {
-	                FlxG.camera.flash(0xFFFF0000, 2.0);
-	                object2.kill();
-	                gameWonText.visible = false;
-	                gameOverText.visible = true;
-	            } else {
-	                e.isDead = true;
-	                e.animation.play("death");
-	                object1.kill();
-		        	object1.exists = true; 
-	                new FlxTimer().start(DEATH_ANIMATION_DURATION, function(timer:FlxTimer){ object1.exists = false; });
-	            }
+	        if (playerHealth < 1) 
+	        {
+	            FlxG.camera.flash(0xFFFF0000, 2.0);
+	            object2.kill();
+
+	            controlsText.text = "R to Restart";
+				controlsText.visible = true;
+				controlsText.alignment = CENTER;
+				controlsText.screenCenter(X);
+
+	            gameWonText.visible = false;
+	            gameOverText.visible = true;
+	        } else 
+	        {
+	            e.isDead = true;
+	            e.animation.play("death");
+	            object1.kill();
+	        	object1.exists = true; 
+	            new FlxTimer().start(DEATH_ANIMATION_DURATION, function(timer:FlxTimer){ object1.exists = false; });
+	        }
 	        
 	    case Projectile: 
 	    	playerHealth--;
@@ -427,9 +452,17 @@ class PlayState extends FlxState
 	    	if (playerHealth < 1) {
 	    		FlxG.camera.flash(0xFFFF0000, 2.0);
 	    		object2.kill();
+
+	    		controlsText.text = "R to Restart";
+				controlsText.visible = true;
+				controlsText.alignment = CENTER;
+				controlsText.screenCenter(X);
+
 	    		gameWonText.visible = false;
 	    		gameOverText.visible = true;
-	            } else {
+
+	            } else 
+	            {
 	                object1.kill(); // projectiles just disappear, no animation
 	            }
 	        }
@@ -452,7 +485,8 @@ class PlayState extends FlxState
 		        object1.exists = true; 
 		        new FlxTimer().start(DEATH_ANIMATION_DURATION, function(timer:FlxTimer){ object1.exists = false; });
 				object2.kill();      
-			}  
+			} 
+			else return;
 
 	        case Enemy: 
 	        var env:Enemy = cast object1;
@@ -466,6 +500,7 @@ class PlayState extends FlxState
 		        new FlxTimer().start(DEATH_ANIMATION_DURATION, function(timer:FlxTimer){ object1.exists = false; });
 				object2.kill();
 			}
+			else return;
 
 	        case Projectile:
 			object1.kill();
@@ -550,6 +585,8 @@ class PlayState extends FlxState
 
 		if (boss.hp <= 0)
 		{
+			FlxG.sound.play("assets/sounds/DeathBoss.ogg", 0.4, false);
+
 			FlxG.camera.flash(0xFFFFFFFF, 1.0); // Flash white
 			boss.kill();
 
@@ -744,7 +781,7 @@ class PlayState extends FlxState
 	function updateMultishotText():Void
 	{
 		if (multishotCharge >= MULTISHOT_CHARGE_MAX)
-			multishotControlsText.visible = true;
+			controlsText.visible = true;
 		
 		multishotText.text = "Super: " + multishotCharge + "/" + MULTISHOT_CHARGE_MAX;
 	}
@@ -804,6 +841,7 @@ class PlayState extends FlxState
 
 				//create a new projectile with the calulated data
 				var ep = new Projectile(xC,yC,targetAng, 1, 2);
+				FlxG.sound.play("assets/sounds/ShootEnemy.ogg", 0.4, false);
 				enemyProjectiles.add(ep);
 			}
 		}
@@ -811,11 +849,6 @@ class PlayState extends FlxState
 		//reroll shot delay
 		shotDelay = FlxG.random.float(-ENEMY_SHOT_DELAY, ENEMY_SHOT_DELAY) + 3;
 	}
-
-	// function deathAnimation(obj:FlxSprite)
-	// {
-
-	// }
 
 
 	// function togglePause():Void

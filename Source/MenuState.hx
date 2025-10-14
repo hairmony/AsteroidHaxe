@@ -177,6 +177,8 @@ class MenuState extends FlxState
 		    "\n" +
 		    "SOUND EFFECTS\n" +
 		    "Driken5482 via Pixabay\n" +
+		    "freesound_community via Pixabay\n" +
+		    "Data_pion via Pixabay\n" +
 		    "\n" +
 		    "\n" +
 		    "\n" +
@@ -208,18 +210,19 @@ class MenuState extends FlxState
 		    "HOW TO PLAY:\n\n" +
 		    "1. WASD to move\n" +
 		    "2. LMB to shoot\n" +
-		    "3. SHIFT to dodge\n" +
+		    "3. SHIFT/RMB to dodge\n" +
 		    "3. SPACE to use SUPER\n" +
-		    "4. R to restart\n" +
-		    "5. ESC to pause\n" +
 		    "4. Hit asteroids/enemies to charge SUPER\n" +
 		    "6. Survive the asteroid shower\n" +
 		    "7. Survive the enemy drones\n" +
-		    "8. Defeat ENEMY LEADERs to gain HP\n\n" +
+		    "8. Defeat ENEMY LEADERs to gain HP\n" +
+		    "4. R to restart\n" +
+		    "5. ESC to pause\n" +
+		    "\n" +
 		    "Press 'How To Play' to close panel."
 		);
 
-		rulesText.y = (FlxG.height / 2) - (rulesText.height / 2) - 50;
+		rulesText.y = (FlxG.height / 2) - (rulesText.height / 2) - 60;
 		rulesText.setFormat(null, 12, FlxColor.WHITE, "left"); // LEFT ALIGNED!!!!
 		rulesText.visible = false;
 		add(rulesText);

@@ -19,8 +19,14 @@ Export/neko/bin/assets/music/BossMusic.ogg
 Export/neko/bin/assets/music/LevelMusic.ogg
 Export/neko/bin/assets/music/LevelMusic2.ogg
 Export/neko/bin/assets/music/MenuMusic.ogg
+Export/neko/bin/assets/sounds/DeathBoss.ogg
+Export/neko/bin/assets/sounds/DeathEnemy2.ogg
+Export/neko/bin/assets/sounds/Dodge.ogg
 Export/neko/bin/assets/sounds/ExplodeAsteroid.ogg
 Export/neko/bin/assets/sounds/ExplodeEnemy.ogg
+Export/neko/bin/assets/sounds/ShootEnemy.ogg
+Export/neko/bin/assets/sounds/ShootPlayer.ogg
+Export/neko/bin/assets/sounds/ShootSpecial.ogg
 Export/neko/bin/flixel/sounds/beep.ogg
 Export/neko/bin/flixel/sounds/flixel.ogg
 Export/neko/bin/flixel/fonts/nokiafc22.ttf

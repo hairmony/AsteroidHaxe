@@ -72,6 +72,8 @@ class Boss extends FlxSprite
 			return;
 		}
 
+		FlxG.sound.play("assets/sounds/ShootEnemy.ogg", 0.4, false);
+
 		var angleIncrement:Float = 360 / BOSS_CIRCLE_SHOT_AMOUNT;
 
 		var spinAddtion:Float = 0;
@@ -80,7 +82,7 @@ class Boss extends FlxSprite
 		if (hp <= BOSS_HP_MAX / 2)
 		{
 			spinAddtion = -6.5;
-			shootDelayMultiplier = 0.8; // lower number is faster (its the percentage of DELAY)
+			shootDelayMultiplier = 0.75; // lower number is faster (its the percentage of DELAY)
 		}
 
 		for (i in 0...BOSS_CIRCLE_SHOT_AMOUNT)
@@ -88,6 +90,8 @@ class Boss extends FlxSprite
 			var playState:PlayState = cast(FlxG.state, PlayState);
 			if (playState != null)
 			{
+				FlxG.sound.play("assets/sounds/ShootEnemy.ogg", 0.4, false);
+
 				var angle = patternAngle + (i * angleIncrement);
 				var p = new Projectile(getGraphicMidpoint().x, getGraphicMidpoint().y, angle, 2, BULLET_ASSET);
 
@@ -96,7 +100,8 @@ class Boss extends FlxSprite
 		}
 
 		patternAngle += 2 + spinAddtion;
-		attackTimer.start(BOSS_CIRCLE_ATTACK_DELAY * shootDelayMultiplier, firePatternCircle, 0);
+		// attackTimer.start(BOSS_CIRCLE_ATTACK_DELAY * shootDelayMultiplier, firePatternCircle, 0);
+		timer.reset(BOSS_CIRCLE_ATTACK_DELAY * shootDelayMultiplier);
 	}
 
 	var lastGapPosition:Int = FlxG.random.int(0, BOSS_WALL_SHOT_AMOUNT - BOSS_WALL_GAP_SIZE);
@@ -106,6 +111,8 @@ class Boss extends FlxSprite
 	{
 		if (!alive || PauseState.isPaused) 
 			return;
+
+		FlxG.sound.play("assets/sounds/ShootEnemy.ogg", 0.4, false);
 
 	    var playState:PlayState = cast(FlxG.state, PlayState);
 	    if (playState == null) 
@@ -145,6 +152,8 @@ class Boss extends FlxSprite
 
 	        playState.enemyProjectiles.add(p);
 	    }
+
+	    timer.reset(BOSS_WALL_ATTACK_DELAY);
 	}
 
 	// Override kill() to stop attack timer if boss died
@@ -177,6 +186,9 @@ class Boss extends FlxSprite
 	override public function update(elapsed:Float):Void
 	{
 		super.update(elapsed);
+
+		if (attackTimer != null)
+			attackTimer.active = !PauseState.isPaused;
 
 		if (velocity.x != 0)
         {
