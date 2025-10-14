@@ -283,7 +283,7 @@ class PlayState extends FlxState
 		if (FlxG.keys.justPressed.R)
 		{
 			// MULTIPLIER = 1;
-			controlsText = "SPACE to SUPER"
+			controlsText.text = "SPACE to SUPER";
 			FlxG.resetState(); // Reset with R key
 		}
 
