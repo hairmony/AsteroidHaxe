@@ -332,7 +332,7 @@ class PlayState extends FlxState
 				updateMultishotText();
 			}
 
-			if ((FlxG.keys.justReleased.SHIFT || FlxG.mouse.justReleasedRight) && !ship.isDodging)
+			if (FlxG.mouse.justReleasedRight && !ship.isDodging)
 			{
 				FlxG.sound.play("assets/sounds/Dodge.ogg", 0.4, false);
 
@@ -392,6 +392,7 @@ class PlayState extends FlxState
 	        if (playerHealth < 1) {
 	            FlxG.camera.flash(0xFFFF0000, 2.0);
 	            object2.kill();
+	            FlxG.sound.play("assets/sounds/DeathEnemy2.ogg", 0.4, false);
 
 	            controlsText.text = "R to Restart";
 				controlsText.visible = true;
@@ -407,6 +408,8 @@ class PlayState extends FlxState
 	            env.isDead = true;
 	            env.animation.play("death");
 	            object1.kill();
+	            FlxG.sound.play("assets/sounds/ExplodeAsteroid.ogg", 0.4, false);
+
 		        object1.exists = true; 
 	            new FlxTimer().start(0.15, function(timer:FlxTimer){ object1.exists = false; });
 	        }
@@ -428,6 +431,7 @@ class PlayState extends FlxState
 	        {
 	            FlxG.camera.flash(0xFFFF0000, 2.0);
 	            object2.kill();
+	            FlxG.sound.play("assets/sounds/DeathEnemy2.ogg", 0.4, false);
 
 	            controlsText.text = "R to Restart";
 				controlsText.visible = true;
@@ -441,6 +445,8 @@ class PlayState extends FlxState
 	            e.isDead = true;
 	            e.animation.play("death");
 	            object1.kill();
+	            FlxG.sound.play("assets/sounds/ExplodeEnemy.ogg", 0.4, false);
+
 	        	object1.exists = true; 
 	            new FlxTimer().start(DEATH_ANIMATION_DURATION, function(timer:FlxTimer){ object1.exists = false; });
 	        }
