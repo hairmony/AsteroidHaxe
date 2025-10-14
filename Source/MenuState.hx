@@ -211,13 +211,14 @@ class MenuState extends FlxState
 		    "1. WASD to move\n" +
 		    "2. LMB to shoot\n" +
 		    "3. SHIFT/RMB to dodge\n" +
-		    "3. SPACE to use SUPER\n" +
-		    "4. Hit asteroids/enemies to charge SUPER\n" +
-		    "6. Survive the asteroid shower\n" +
-		    "7. Survive the enemy drones\n" +
+		    "4. SPACE to use SUPER\n" +
+		    "5. Hit asteroids/enemies to charge SUPER\n" +
+		    "6. Destroy the asteroid shower\n" +
+		    "7. Clear the enemy drones to advance\n" +
 		    "8. Defeat ENEMY LEADERs to gain HP\n" +
-		    "4. R to restart\n" +
-		    "5. ESC to pause\n" +
+		    "9. Defeat all ENEMY LEADERS to WIN!\n" +
+		    "10. R to restart\n" +
+		    "11. ESC to pause\n" +
 		    "\n" +
 		    "Press 'How To Play' to close panel."
 		);
