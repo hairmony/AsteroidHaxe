@@ -9,12 +9,12 @@ import flixel.util.FlxTimer;
 
 class Player extends FlxSprite {
 	//var sprite:FlxSprite;
-	public static var PLAYER_SPEED = 150;
+	public static var PLAYER_SPEED = 150; //150
 
 	// Dodging variables
 	public var isDodging:Bool = false;
 	public var dodgeDuration:Float = 0.25; // Seconds
-	public static var DODGE_SPEED:Float = 400;   // Speed DURIGN dodge
+	public static var DODGE_SPEED:Float = 400; // Speed DURIGN dod40
 	public var dodgeTimer:Float = 0;
 
 	public var isInvincible = false;

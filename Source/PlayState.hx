@@ -56,9 +56,11 @@ class PlayState extends FlxState
 
 	// Variables for the multi-shot cooldown
 	public var multishotCharge:Float = 0;
-	public static var MULTISHOT_CHARGE_MAX:Float = 20; // in number of objects killed
-	public static var MULTISHOT_SHOT_AMOUNT:Int = 8;
+	public static var MULTISHOT_CHARGE_MAX:Float = 20; //20 in number of objects killed
+	public static var MULTISHOT_SHOT_AMOUNT:Int = 8; //8
 	public var blinkTimer:Float = 0;
+
+	public static var BULLET_PENETRATION:Int = 3; //3, Bullet pen amount for special projectile
 	
 	// Variables for asteroid
 	public static var ASTEROID_AMOUNT:Int = 8;
@@ -79,9 +81,10 @@ class PlayState extends FlxState
 	var enemiesToSpawnForWave:Int = 0;
 	var asteroidsToSpawnForWave:Int = 0;
 
-	private var backdrop:FlxBackdrop;
-
 	public var FINAL_WAVE:Int = 12;
+	public static var SPAWN_RATE:Float = 0.5; //0.5
+
+	private var backdrop:FlxBackdrop;
 	
 	// Pause menu variables
 	private function pausemenu():Void
@@ -325,7 +328,7 @@ class PlayState extends FlxState
 					// We use ship.angle here to base the shot direction on where the ship is facing
 					var p = new Projectile(ship.getGraphicMidpoint().x, ship.getGraphicMidpoint().y, ship.angle + angleIncrement, 0, 1);
 					specialProjectiles.add(p); // Add projectile to group
-					p.bulletPenetration = 3;
+					p.bulletPenetration = BULLET_PENETRATION;
 					angleIncrement += (360/MULTISHOT_SHOT_AMOUNT);
 				}
 
@@ -479,6 +482,8 @@ class PlayState extends FlxState
 	// Function handles projectile collision
 	function collideProjectile(object1:FlxObject, object2:FlxObject):Void
 	{
+		var pointsAdd:Int = 0;
+
 		switch (Type.getClass(object1))
 		{
 			case Asteroid:
@@ -491,7 +496,9 @@ class PlayState extends FlxState
 		        object1.kill();
 		        object1.exists = true; 
 		        new FlxTimer().start(DEATH_ANIMATION_DURATION, function(timer:FlxTimer){ object1.exists = false; });
-				object2.kill();      
+
+				pointsAdd = 200;
+				asteroidHits++;
 			} 
 			else return;
 
@@ -505,16 +512,15 @@ class PlayState extends FlxState
 		        object1.kill();
 		        object1.exists = true; 
 		        new FlxTimer().start(DEATH_ANIMATION_DURATION, function(timer:FlxTimer){ object1.exists = false; });
-				object2.kill();
+
+				pointsAdd = 100;
+				enemyHits++;
+				updateMultiplier();
 			}
 			else return;
 
 	        case Projectile:
-			object1.kill();
-			object2.kill();
 		}
-		
-		var pointsAdd:Int = 0;
 
 		if (Std.isOfType(object1, Projectile))
 	    {	
@@ -537,31 +543,6 @@ class PlayState extends FlxState
 	    }
 	    // else
 	    // 	object2.kill();
-
-		// Check if the object is an Asteroid
-		if (Std.isOfType(object1, Asteroid))
-		{
-			// var a = new Asteroid();
-			// asteroid.add(a);
-			// Add to asteroid kill count
-			asteroidHits++;
-			pointsAdd = 100;
-		}
-		// Add in when we have Enemy objects
-		else if (Std.isOfType(object1, Enemy))
-		{
-			// Add to the enemy kill count
-		 	enemyHits++;
-		 	updateMultiplier();
-
-		 	pointsAdd = 200;
-
-		 	// var e = new Enemy();
-		 	// enemy.add(e);
-
-		 	//REMOVE ENEMY FROM FLEX OBJECT TO NOT BREAK ENEMY SHOT CYCLE
-		 	// enemy.remove(object1);
-		}
 
 		// Add to multishot charge when object is hit
 		if (multishotCharge < MULTISHOT_CHARGE_MAX)
@@ -635,7 +616,7 @@ class PlayState extends FlxState
 
 		if (currentWave == 0)
 	    {
-	        enemiesToSpawn = 0;
+	        enemiesToSpawn = 0; //0
 	        asteroidsToSpawn = 12;
 	        waveText.text = "Shoot the Asteroids!";
 	    }
@@ -725,7 +706,7 @@ class PlayState extends FlxState
 		// Spawn enemies and asteroids
 		if (enemiesToSpawn > 0) // for some reason FlxTimer loops inf times if the value is 0
 		{
-			new FlxTimer().start(0.5, function(timer:FlxTimer)
+			new FlxTimer().start(SPAWN_RATE, function(timer:FlxTimer)
 			{
 			    if (!PauseState.isPaused)
 			    	enemy.add(new Enemy());
@@ -735,7 +716,7 @@ class PlayState extends FlxState
 		// Add asteroids staggered
 		if (asteroidsToSpawn > 0) // for some reason FlxTimer loops inf times if the value is 0
 		{
-			new FlxTimer().start(0.5, function(timer:FlxTimer)
+			new FlxTimer().start(SPAWN_RATE, function(timer:FlxTimer)
 			{
 				if (!PauseState.isPaused)
 			    	asteroid.add(new Asteroid());
@@ -743,8 +724,8 @@ class PlayState extends FlxState
 		}
 
 		// Calculating the total spawn time to spawn in everything
-		var enemySpawnDuration = 0.5 * enemiesToSpawn;
-		var asteroidSpawnDuration = 0.5 * asteroidsToSpawn;
+		var enemySpawnDuration = SPAWN_RATE * enemiesToSpawn;
+		var asteroidSpawnDuration = SPAWN_RATE * asteroidsToSpawn;
 		var totalSpawnTime = Math.max(enemySpawnDuration, asteroidSpawnDuration);
 
 		if (totalSpawnTime > 0)
